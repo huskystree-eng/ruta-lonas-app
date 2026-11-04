@@ -9,8 +9,10 @@ for i,r in enumerate(recs):
     r['promo']=r['promo'] or ''
 rutas=['Ruta Cardel','Ruta Costa','Por Medida y Promoción']
 used={r['cr'] for r in recs}
+FIX=['50WFV']  # Cerro Gordo JAL traía la dirección de El Hatito (50R7X)
+for c in FIX: d['addr'][c]['dir']=''
 addr={k:{'dir':v['dir'],'mpo':v['mpo']} for k,v in d['addr'].items() if k in used}
-data=json.dumps(dict(rutas=rutas,recs=recs,addr=addr),ensure_ascii=False,separators=(',',':'))
+data=json.dumps(dict(rutas=rutas,recs=recs,addr=addr,fix=FIX),ensure_ascii=False,separators=(',',':'))
 open('index.html','w').write(open('template.html').read().replace('/*DATA*/',data))
 json.dump({"name":"Recorrido Lonas P12","short_name":"Lonas P12","start_url":".","display":"standalone","background_color":"#c8102e","theme_color":"#c8102e","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]},open('manifest.json','w'))
 open('sw.js','w').write("""const C='lonas-p12-v1',F=['./','index.html','manifest.json','icon-192.png'];

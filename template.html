@@ -34,7 +34,7 @@ a.nav{background:var(--ac);color:#fff;border-radius:8px}
 textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid var(--bd);border-radius:8px;padding:6px;background:var(--card);color:var(--tx);resize:vertical}
 #st{font-size:12px;padding:0 12px;color:var(--mut)}
 #map{height:68vh;min-height:340px;margin:8px 12px;border-radius:10px;border:1px solid var(--bd)}
-.pin{width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;font:700 12px/22px system-ui;text-align:center;border:2px solid #fff;box-shadow:0 1px 4px #0006}.pin.ok{background:#777}
+.pin{width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;font:700 12px/22px system-ui;text-align:center;border:2px solid #fff;box-shadow:0 1px 4px #0006}.pin.ok{background:#777}.pin.ap{background:#e08a00}
 .pp{font:13px/1.35 system-ui;min-width:170px}.pp a{display:inline-block;margin:6px 6px 0 0;padding:5px 9px;border-radius:7px;background:var(--ac);color:#fff;text-decoration:none}.pp button{margin-top:6px;font-size:13px;padding:4px 8px}
 </style></head><body>
 <header>
@@ -57,7 +57,9 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 const D=/*DATA*/;
 const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 const SV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let done=LS('done')||{},geo=LS('geo')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='',view='list',map,layer,meMk,rline,fitNext=true,P=LS('plan')||{},RL={};
+let done=LS('done')||{},geo=LS('geo2')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='',view='list',map,layer,meMk,rline,fitNext=true,P=LS('plan')||{},RL={},AD=LS('ad')||{};
+{const o=LS('geo')||{};Object.keys(o).forEach(k=>{if(o[k].src==='manual'&&!geo[k])geo[k]=o[k]})}
+(D.fix||[]).forEach(c=>{if(geo[c]&&geo[c].src==='auto'){delete geo[c];SV('geo2',geo)}});
 const ix=s=>{const i=(P[route]||[]).indexOf(s.cr);return i<0?9999:i};
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VG={Heineken:['2026-10-30','2026-11-14'],Modelo:['2026-11-05','2026-12-02'],Kof:['2026-11-05','2026-12-02']};
@@ -68,7 +70,7 @@ function hav(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180,u=r(c-a),v=r(d-b),h=Math
 const fd=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';
 const navUrl=s=>{const g=geo[s.cr];const dest=g&&g.src==='manual'?g.lat+','+g.lng:encodeURIComponent((s.dir?s.dir+', ':'OXXO '+s.tienda+', ')+(s.mpo?s.mpo+', ':'')+'Veracruz, México');return 'https://www.google.com/maps/dir/?api=1&destination='+dest+'&travelmode=driving'};
 function stores(){const m=new Map(),t=txt.toLowerCase();
- D.recs.filter(r=>r.ruta===route&&(!brand||r.marca===brand)).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:a.dir||'',sp:[]})}m.get(r.cr).sp.push(r)});
+ D.recs.filter(r=>r.ruta===route&&(!brand||r.marca===brand)).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),sp:[]})}m.get(r.cr).sp.push(r)});
  let l=[...m.values()].filter(s=>!t||(s.tienda+s.cr+s.mpo+s.dir).toLowerCase().includes(t));
  l.forEach(s=>{const g=geo[s.cr];s.d=me&&g?hav(me.lat,me.lng,g.lat,g.lng):null;s.ok=s.sp.every(x=>done[x.id])});
  l.sort((a,b)=>(a.ok-b.ok)||(near&&me?((a.d??1e12)-(b.d??1e12)):P[route]?ix(a)-ix(b):(a.mpo.localeCompare(b.mpo)||a.tienda.localeCompare(b.tienda))));
@@ -80,13 +82,13 @@ function render(){
  $('list').innerHTML=stores().map(s=>{const g=geo[s.cr],here=!s.ok&&s.d!=null&&s.d<80;
  return`<article class="c ${s.ok?'ok':''} ${here?'here':''}" data-cr="${s.cr}">
  <h3>${ix(s)<9999?'#'+(ix(s)+1)+' ':''}${esc(s.tienda)} <small>${s.cr}</small></h3>
- <div class="meta">${esc(s.mpo)}${s.d!=null?' · <b>'+fd(s.d)+'</b>':''}${here?' · <b>📍 Estás aquí</b>':''}${g?(g.src==='manual'?' · GPS exacto':' · ubic. aprox.'):''}</div>
+ <div class="meta">${esc(s.mpo)}${s.d!=null?' · <b>'+fd(s.d)+'</b>':''}${here?' · <b>📍 Estás aquí</b>':''}${g?(g.src==='manual'?' · GPS exacto':(g.lvl<=2?' · ubic. buena':' · ⚠ ubic. aproximada')):''}</div>
  <div class="addr">${s.dir?esc(s.dir):'Sin dirección en el archivo: se busca por nombre'}</div>
  ${s.sp.map(x=>{const[v,w]=vigTxt(x.marca);return`<label class="sp ${x.marca}"><input type="checkbox" data-id="${x.id}" ${done[x.id]?'checked':''}>
  <span><b>${x.tipo.toUpperCase()} ${x.medida.replace(/ x /,' × ')} m</b><span class="tag ${x.marca}">${x.marca}</span><br>
  <span class="vg ${w?'warn':''}">${v}${x.orig!==x.medida?' · medida original '+esc(x.orig):''}</span>
  <details><summary>Promoción a colocar</summary>${esc(x.promo)}</details></span></label>`}).join('')}
- <div class="act"><a class="nav" target="_blank" rel="noopener" href="${navUrl(s)}">🧭 Navegar</a><button data-a="pin">📌 Estoy aquí</button><button data-a="find">Ubicar</button></div>
+ <div class="act"><a class="nav" target="_blank" rel="noopener" href="${navUrl(s)}">🧭 Navegar</a><button data-a="pin">📌 Estoy aquí</button><button data-a="find">Ubicar</button><button data-a="edit">✏️ Dirección</button></div>
  <textarea rows="1" data-n="${s.cr}" placeholder="Notas (ej. no había espacio, foto pendiente)">${esc(notes[s.cr]||'')}</textarea></article>`}).join('')||'<p>Sin resultados.</p>';drawMap()}
 function gpsErr(e){$('st').textContent='GPS: '+(e.code===1?'permiso denegado, actívalo en el navegador':'no disponible')}
 $('gps').onclick=()=>{if(watch){navigator.geolocation.clearWatch(watch);watch=null;me=null;$('st').textContent='';return render()}
@@ -96,15 +98,29 @@ $('near').onclick=()=>{near=!near;if(near&&!me)$('st').textContent='Activa el GP
 $('hd').onclick=()=>{hd=!hd;render()};
 $('q').oninput=e=>{txt=e.target.value;render()};$('bf').onchange=e=>{brand=e.target.value;render()};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function geocode(s){const mp=s.mpo?s.mpo+', ':'',qs=[];
- if(s.dir)qs.push(s.dir+', '+mp+'Veracruz, México');
- qs.push('OXXO '+s.tienda.replace(/\b(VER|JAL|MTT)\b/g,'').trim()+', '+mp+'Veracruz, México');
- for(const q of qs){try{const r=await(await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=mx&q='+encodeURIComponent(q))).json();
-  if(r[0]){geo[s.cr]={lat:+r[0].lat,lng:+r[0].lon,src:'auto'};SV('geo',geo);return true}}catch(e){}await sleep(1100)}return false}
-const rs=()=>{const m=new Map();D.recs.filter(r=>r.ruta===route).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:a.dir||''})}});return[...m.values()]};
+const MC=LS('mpoc')||{};
+async function nm(q,n){try{return await(await fetch('https://nominatim.openstreetmap.org/search?format=json&limit='+(n||3)+'&countrycodes=mx&q='+encodeURIComponent(q))).json()}catch(e){return[]}}
+async function anchor(mp){const k=mp.toUpperCase();if(!k)return null;if(MC[k]!==undefined)return MC[k];const r=await nm(mp+', Veracruz, México',1);await sleep(1100);MC[k]=r[0]?{lat:+r[0].lat,lng:+r[0].lon}:null;SV('mpoc',MC);return MC[k]}
+function parse(d){const u=' '+d.replace(/\s+/g,' ')+' ',m=(re)=>((u.match(re)||[])[1]||'').trim();
+ return{cp:m(/\b(\d{5})\b/),
+ col:m(/\b(?:COL(?:ONIA)?|FRACC(?:IONAMIENTO)?|U\.?H)\.?\s+([^,()]+?)(?=\s+(?:C\.?P|MPIO|VERACRUZ|VER\b|XALAPA)|\s*[,(]|\s+\d{5}|\s*$)/i),
+ st:m(/^\s*([^,#]*?)(?=\s+(?:ESQ|ENTRE|NUM|N[ÚU]M|NO\b|N°|S\/N|MZ[AN]?|LT|LTE|COL|FRACC|C\.?P)|\s+#|\s+\d|,|\s*$)/i),
+ cr:m(/\b(?:ESQ(?:UINA)?\.?|ENTRE)\s+([^,]+?)(?=\s+(?:NUM|N[ÚU]M|NO\b|COL|FRACC|C\.?P|MZ[AN]?|LT)|\s+\d{5}|,|\s*$)/i)}}
+async function geocode(s){const mp=s.mpo||'',a=await anchor(mp),p=s.dir?parse(s.dir):{},nmx=s.tienda.replace(/\b(VER|JAL|MTT)\b/g,'').trim(),tail=(mp?mp+', ':'')+'Veracruz, México',T=[];
+ const ok=(la,lo)=>a?hav(a.lat,a.lng,la,lo)<35000:(la>17&&la<22.6&&lo>-98.8&&lo<-93.5);
+ if(p.st)T.push([1,[p.st,p.col,p.cp,tail].filter(Boolean).join(', ')]);
+ if(s.dir)T.push([1,s.dir+', '+tail]);
+ if(p.st&&p.cr)T.push([2,p.st+' y '+p.cr+', '+tail]);
+ if(p.col)T.push([3,p.col+', '+tail]);
+ if(p.cp)T.push([4,p.cp+', Veracruz, México']);
+ T.push([5,'OXXO '+nmx+', '+tail]);
+ for(const[lv,q]of T){await sleep(1100);const r=(await nm(q,3)).find(x=>ok(+x.lat,+x.lon));
+  if(r){geo[s.cr]={lat:+r.lat,lng:+r.lon,src:'auto',lvl:lv};SV('geo2',geo);return true}}
+ if(a){geo[s.cr]={lat:a.lat,lng:a.lng,src:'auto',lvl:6};SV('geo2',geo);return true}return false}
+const rs=()=>{const m=new Map();D.recs.filter(r=>r.ruta===route).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:AD[r.cr]!==undefined?AD[r.cr]:(a.dir||'')})}});return[...m.values()]};
 async function geoMissing(){const l=rs().filter(s=>!geo[s.cr]);let ok=0;
  for(let i=0;i<l.length;i++){$('st').textContent='Ubicando tiendas '+(i+1)+'/'+l.length+'… (necesita internet)';if(await geocode(l[i]))ok++;await sleep(1100)}
- const f=l.filter(s=>!geo[s.cr]);$('st').textContent=l.length?('Ubicadas '+ok+' de '+l.length+(f.length?'. Sin ubicar: '+f.map(s=>s.tienda).join(', ')+' (usa Navegar o “Estoy aquí”)':'')+'. Posiciones aproximadas.'):'';render()}
+ const f=l.filter(s=>!geo[s.cr]||(geo[s.cr].lvl||0)>=4);$('st').textContent=l.length?('Ubicadas '+ok+' de '+l.length+(f.length?'. Revisar ubicación: '+f.map(s=>s.tienda).join(', ')+' (usa Navegar o “Estoy aquí”)':'')+'. Posiciones aproximadas.'):'';render()}
 $('geoall').onclick=geoMissing;
 $('vw').onclick=()=>{view=view==='map'?'list':'map';$('map').hidden=view!=='map';$('list').hidden=view==='map';$('vw').textContent=view==='map'?'📋 Lista':'🗺️ Mapa';fitNext=true;render();if(map)setTimeout(()=>map.invalidateSize(),50)};
 $('plan').onclick=async()=>{await geoMissing();
@@ -121,8 +137,8 @@ window.doneAll=cr=>{D.recs.filter(r=>r.ruta===route&&r.cr===cr).forEach(r=>done[
 function drawMap(){if(view!=='map')return;
  if(!map){map=L.map('map').setView([19.2,-96.3],9);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);layer=L.layerGroup().addTo(map)}
  layer.clearLayers();const b=[];let n0=0;
- stores().forEach(s=>{const g=geo[s.cr];if(!g){n0++;return}const k=ix(s),pop='<div class="pp"><b>'+esc(s.tienda)+'</b> <small>'+s.cr+'</small><br>'+s.sp.map(x=>(done[x.id]?'✅ ':'⬜ ')+x.tipo+' '+x.medida+' · '+x.marca).join('<br>')+'<br><a target="_blank" rel="noopener" href="'+navUrl(s)+'">🧭 Navegar</a>'+(s.ok?'':'<br><button onclick="doneAll(\''+s.cr+'\')">Marcar todo hecho</button>')+'</div>';
-  L.marker([g.lat,g.lng],{icon:L.divIcon({className:'',html:'<div class="pin '+(s.ok?'ok':'')+'">'+(k<9999&&!s.ok?k+1:'')+'</div>',iconSize:[26,26],iconAnchor:[13,13]})}).bindPopup(pop).addTo(layer);b.push([g.lat,g.lng])});
+ stores().forEach(s=>{const g=geo[s.cr];if(!g){n0++;return}const k=ix(s),pop='<div class="pp"><b>'+esc(s.tienda)+'</b> <small>'+s.cr+'</small><br>'+s.sp.map(x=>(done[x.id]?'✅ ':'⬜ ')+x.tipo+' '+x.medida+' · '+x.marca).join('<br>')+(g.lvl>=3&&g.src!=='manual'?'<br>⚠ ubicación aproximada':'')+'<br><a target="_blank" rel="noopener" href="'+navUrl(s)+'">🧭 Navegar</a>'+(s.ok?'':'<br><button onclick="doneAll(\''+s.cr+'\')">Marcar todo hecho</button>')+'</div>';
+  L.marker([g.lat,g.lng],{icon:L.divIcon({className:'',html:'<div class="pin '+(s.ok?'ok':g.lvl>=3?'ap':'')+'">'+(k<9999&&!s.ok?k+1:'')+'</div>',iconSize:[26,26],iconAnchor:[13,13]})}).bindPopup(pop).addTo(layer);b.push([g.lat,g.lng])});
  if(rline){rline.remove();rline=null}
  const o=(P[route]||[]).filter(c=>geo[c]);
  if(o.length>1){const pl=RL[route]||(me?[[me.lat,me.lng]]:[]).concat(o.map(c=>[geo[c].lat,geo[c].lng]));rline=L.polyline(pl,{color:'#1a73e8',weight:4,opacity:.8,dashArray:RL[route]?null:'8 6'}).addTo(map)}
@@ -134,7 +150,9 @@ $('csv').onclick=()=>{const c=v=>'"'+String(v).replace(/"/g,'""')+'"';
 document.addEventListener('click',async e=>{const t=e.target,r=t.dataset.r;
  if(r){route=r;fitNext=true;return render()}
  const card=t.closest('.c');if(!card||!t.dataset.a)return;const s=stores().find(x=>x.cr===card.dataset.cr)||D.addr[card.dataset.cr];
- if(t.dataset.a==='pin'){navigator.geolocation.getCurrentPosition(p=>{geo[card.dataset.cr]={lat:p.coords.latitude,lng:p.coords.longitude,src:'manual'};SV('geo',geo);$('st').textContent='Ubicación exacta guardada';render()},gpsErr,{enableHighAccuracy:true})}
+ if(t.dataset.a==='pin'){navigator.geolocation.getCurrentPosition(p=>{geo[card.dataset.cr]={lat:p.coords.latitude,lng:p.coords.longitude,src:'manual'};SV('geo2',geo);$('st').textContent='Ubicación exacta guardada';render()},gpsErr,{enableHighAccuracy:true})}
+ if(t.dataset.a==='edit'){const cr=card.dataset.cr,v=prompt('Dirección o referencia de '+s.tienda+' (déjalo vacío para buscar solo por nombre):',s.dir||'');
+  if(v!==null){AD[cr]=v.trim();SV('ad',AD);if(geo[cr]&&geo[cr].src==='auto'){delete geo[cr];SV('geo2',geo)}render()}return}
  if(t.dataset.a==='find'){t.textContent='…';const ok=await geocode(s);$('st').textContent=ok?'Ubicada (aprox.)':'No se encontró; usa Navegar o “Estoy aquí”';render()}});
 document.addEventListener('change',e=>{const t=e.target;
  if(t.dataset.id){done[t.dataset.id]=t.checked||undefined;SV('done',done);render()}
