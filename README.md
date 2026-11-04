@@ -8,4 +8,4 @@ App web (PWA) para hacer el recorrido de instalación de lonas y pendones.
 3. Abre `https://TU-USUARIO.github.io/NOMBRE-REPO/` en el celular (con HTTPS el GPS funciona).
 4. En el celular: menú del navegador → "Agregar a pantalla de inicio".
 
-El avance (checks y notas) se guarda en el propio celular. `build.py` y `template.html` sirven para regenerar `index.html` si cambian los datos.
+El avance (checks y notas) se guarda en el propio celular. El mapa y la ubicación de tiendas necesitan internet (OpenStreetMap). `build.py` y `template.html` regeneran `index.html` si cambian los datos.
