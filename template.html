@@ -36,6 +36,7 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 #map{height:68vh;min-height:340px;margin:8px 12px;border-radius:10px;border:1px solid var(--bd)}
 .pin{width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;font:700 12px/22px system-ui;text-align:center;border:2px solid #fff;box-shadow:0 1px 4px #0006}.pin.ok{background:#777}.pin.ap{background:#e08a00}
 .pp{font:13px/1.35 system-ui;min-width:170px}.pp a{display:inline-block;margin:6px 6px 0 0;padding:5px 9px;border-radius:7px;background:var(--ac);color:#fff;text-decoration:none}.pp button{margin-top:6px;font-size:13px;padding:4px 8px}
+.td{margin:8px 12px;padding:8px 10px;background:var(--card);border:1px solid var(--bd);border-radius:10px;font-size:13px}.td p{margin:6px 0}.td a.nav{display:inline-block;border-radius:8px;color:#fff}
 </style></head><body>
 <header>
 <h1><span>Recorrido Lonas P12</span><span id="pg"></span></h1>
@@ -47,9 +48,10 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 <select id="bf"><option value="">Todas</option><option>Heineken</option><option>Modelo</option><option>Kof</option></select>
 </div>
 <div class="tools">
-<button id="vw">🗺️ Mapa</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar</button>
+<button id="vw">🗺️ Mapa</button><button id="gmr">🧭 Ruta en Google Maps</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar</button>
 </div>
 <div id="st"></div>
+<div id="td" class="td" hidden></div>
 <div id="map" hidden></div>
 <main id="list"></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -68,12 +70,15 @@ function vigTxt(m){const [a,b]=VG[m],t=new Date().toISOString().slice(0,10);
  if(t>b)return['VENCIDA el '+b.slice(8)+'/'+b.slice(5,7),1];return['Vigente hasta '+b.slice(8)+'/'+b.slice(5,7),0]}
 function hav(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180,u=r(c-a),v=r(d-b),h=Math.sin(u/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(v/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 const fd=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';
-const navUrl=s=>{const g=geo[s.cr];const dest=g&&g.src==='manual'?g.lat+','+g.lng:encodeURIComponent((s.dir?s.dir+', ':'OXXO '+s.tienda+', ')+(s.mpo?s.mpo+', ':'')+'Veracruz, México');return 'https://www.google.com/maps/dir/?api=1&destination='+dest+'&travelmode=driving'};
+const qOx=s=>'OXXO '+s.tienda.replace(/\b(VER|JAL|MTT)\b/g,'').trim()+', '+(s.mpo?s.mpo+', ':'')+'Veracruz, México';
+const qAd=s=>s.dir?s.dir+', '+(s.mpo?s.mpo+', ':'')+'Veracruz, México':qOx(s);
+const gm=q=>'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(q)+'&travelmode=driving';
+const navUrl=(s,m)=>{const g=geo[s.cr];if(g&&g.src==='manual')return gm(g.lat+','+g.lng);return gm(m==='o'?qOx(s):qAd(s))};
 function stores(){const m=new Map(),t=txt.toLowerCase();
  D.recs.filter(r=>r.ruta===route&&(!brand||r.marca===brand)).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),sp:[]})}m.get(r.cr).sp.push(r)});
  let l=[...m.values()].filter(s=>!t||(s.tienda+s.cr+s.mpo+s.dir).toLowerCase().includes(t));
- l.forEach(s=>{const g=geo[s.cr];s.d=me&&g?hav(me.lat,me.lng,g.lat,g.lng):null;s.ok=s.sp.every(x=>done[x.id])});
- l.sort((a,b)=>(a.ok-b.ok)||(near&&me?((a.d??1e12)-(b.d??1e12)):P[route]?ix(a)-ix(b):(a.mpo.localeCompare(b.mpo)||a.tienda.localeCompare(b.tienda))));
+ l.forEach(s=>{const g=geo[s.cr];s.cp=s.dir?parse(s.dir).cp:'';s.d=me&&g?hav(me.lat,me.lng,g.lat,g.lng):null;s.ok=s.sp.every(x=>done[x.id])});
+ l.sort((a,b)=>(a.ok-b.ok)||(near&&me?((a.d??1e12)-(b.d??1e12)):P[route]?ix(a)-ix(b):(a.mpo.localeCompare(b.mpo)||(a.cp||'').localeCompare(b.cp||'')||a.tienda.localeCompare(b.tienda))));
  return hd?l.filter(s=>!s.ok):l}
 function render(){
  $('tabs').innerHTML=D.rutas.map(r=>{const n=D.recs.filter(x=>x.ruta===r),d=n.filter(x=>done[x.id]).length;return`<button data-r="${esc(r)}" class="${r===route?'on':''}">${esc(r)} ${d}/${n.length}</button>`}).join('');
@@ -88,7 +93,7 @@ function render(){
  <span><b>${x.tipo.toUpperCase()} ${x.medida.replace(/ x /,' × ')} m</b><span class="tag ${x.marca}">${x.marca}</span><br>
  <span class="vg ${w?'warn':''}">${v}${x.orig!==x.medida?' · medida original '+esc(x.orig):''}</span>
  <details><summary>Promoción a colocar</summary>${esc(x.promo)}</details></span></label>`}).join('')}
- <div class="act"><a class="nav" target="_blank" rel="noopener" href="${navUrl(s)}">🧭 Navegar</a><button data-a="pin">📌 Estoy aquí</button><button data-a="find">Ubicar</button><button data-a="edit">✏️ Dirección</button></div>
+ <div class="act"><a class="nav" target="_blank" rel="noopener" href="${navUrl(s)}">🧭 Navegar</a><a class="nav" style="background:#555" target="_blank" rel="noopener" href="${navUrl(s,'o')}">🔎 Buscar OXXO</a><button data-a="pin">📌 Estoy aquí</button><button data-a="find">Ubicar</button><button data-a="edit">✏️ Dirección</button></div>
  <textarea rows="1" data-n="${s.cr}" placeholder="Notas (ej. no había espacio, foto pendiente)">${esc(notes[s.cr]||'')}</textarea></article>`}).join('')||'<p>Sin resultados.</p>';drawMap()}
 function gpsErr(e){$('st').textContent='GPS: '+(e.code===1?'permiso denegado, actívalo en el navegador':'no disponible')}
 $('gps').onclick=()=>{if(watch){navigator.geolocation.clearWatch(watch);watch=null;me=null;$('st').textContent='';return render()}
@@ -131,13 +136,21 @@ $('plan').onclick=async()=>{await geoMissing();
   if(j.code==='Ok'){ord=j.waypoints.map((w,i)=>[w.waypoint_index,i]).sort((a,b)=>a[0]-b[0]).map(x=>pts[x[1]]).filter(p=>!p.me).map(p=>p.cr);RL[route]=j.trips[0].geometry.coordinates.map(c=>[c[1],c[0]]);info=' · '+Math.round(j.trips[0].distance/1000)+' km · '+Math.round(j.trips[0].duration/60)+' min en auto'}}catch(e){}}
  if(!ord){let cur=me||ps[0],rest=ps.slice(),o=[];while(rest.length){let bi=0,bd=1e18;rest.forEach((p,i)=>{const d=hav(cur.lat,cur.lng,p.lat,p.lng);if(d<bd){bd=d;bi=i}});cur=rest.splice(bi,1)[0];o.push(cur.cr)}ord=o;info=' · orden por cercanía (sin conexión a rutas)'}
  P[route]=ord;SV('plan',P);near=false;fitNext=true;$('st').textContent='Ruta: '+ord.length+' paradas'+info;render()};
+$('gmr').onclick=()=>{const td=$('td');if(!td.hidden){td.hidden=true;return}
+ const l=rs().filter(s=>!D.recs.filter(r=>r.ruta===route&&r.cr===s.cr).every(r=>done[r.id])),cp=s=>(s.dir?parse(s.dir).cp:'')||'99999',px=s=>{const i=(P[route]||[]).indexOf(s.cr);return i<0?9999:i};
+ l.sort((a,b)=>P[route]?px(a)-px(b):(a.mpo.toUpperCase().localeCompare(b.mpo.toUpperCase())||cp(a).localeCompare(cp(b))||a.tienda.localeCompare(b.tienda)));
+ td.hidden=false;if(!l.length){td.textContent='No hay tiendas pendientes en esta ruta';return}
+ let h='<b>Ruta en Google Maps</b> · tandas de 8 paradas desde donde estés. Orden: '+(P[route]?'ruta trazada':'por municipio y código postal')+'.';
+ for(let i=0;i<l.length;i+=8){const c=l.slice(i,i+8),q=c.map(qAd),u='https://www.google.com/maps/dir/?api=1&travelmode=driving&destination='+encodeURIComponent(q[q.length-1])+(q.length>1?'&waypoints='+encodeURIComponent(q.slice(0,-1).join('|')):'');
+  h+='<p><a class="nav" style="padding:6px 10px;text-decoration:none" target="_blank" rel="noopener" href="'+u+'">Tanda '+(i/8+1)+' ▶</a> '+c.map((s,k)=>(i+k+1)+'. '+esc(s.tienda)).join(' → ')+'</p>'}
+ td.innerHTML=h};
 function updateMe(){if(!map)return;if(!me){if(meMk){meMk.remove();meMk=null}return}
  if(meMk)meMk.setLatLng([me.lat,me.lng]);else meMk=L.circleMarker([me.lat,me.lng],{radius:8,color:'#fff',weight:3,fillColor:'#1a73e8',fillOpacity:1}).addTo(map)}
 window.doneAll=cr=>{D.recs.filter(r=>r.ruta===route&&r.cr===cr).forEach(r=>done[r.id]=true);SV('done',done);map.closePopup();render()};
 function drawMap(){if(view!=='map')return;
  if(!map){map=L.map('map').setView([19.2,-96.3],9);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);layer=L.layerGroup().addTo(map)}
  layer.clearLayers();const b=[];let n0=0;
- stores().forEach(s=>{const g=geo[s.cr];if(!g){n0++;return}const k=ix(s),pop='<div class="pp"><b>'+esc(s.tienda)+'</b> <small>'+s.cr+'</small><br>'+s.sp.map(x=>(done[x.id]?'✅ ':'⬜ ')+x.tipo+' '+x.medida+' · '+x.marca).join('<br>')+(g.lvl>=3&&g.src!=='manual'?'<br>⚠ ubicación aproximada':'')+'<br><a target="_blank" rel="noopener" href="'+navUrl(s)+'">🧭 Navegar</a>'+(s.ok?'':'<br><button onclick="doneAll(\''+s.cr+'\')">Marcar todo hecho</button>')+'</div>';
+ stores().forEach(s=>{const g=geo[s.cr];if(!g){n0++;return}const k=ix(s),pop='<div class="pp"><b>'+esc(s.tienda)+'</b> <small>'+s.cr+'</small><br>'+s.sp.map(x=>(done[x.id]?'✅ ':'⬜ ')+x.tipo+' '+x.medida+' · '+x.marca).join('<br>')+(g.lvl>=3&&g.src!=='manual'?'<br>⚠ ubicación aproximada':'')+'<br><a target="_blank" rel="noopener" href="'+navUrl(s)+'">🧭 Navegar</a><a target="_blank" rel="noopener" href="'+navUrl(s,'o')+'">🔎 OXXO</a>'+(s.ok?'':'<br><button onclick="doneAll(\''+s.cr+'\')">Marcar todo hecho</button>')+'</div>';
   L.marker([g.lat,g.lng],{icon:L.divIcon({className:'',html:'<div class="pin '+(s.ok?'ok':g.lvl>=3?'ap':'')+'">'+(k<9999&&!s.ok?k+1:'')+'</div>',iconSize:[26,26],iconAnchor:[13,13]})}).bindPopup(pop).addTo(layer);b.push([g.lat,g.lng])});
  if(rline){rline.remove();rline=null}
  const o=(P[route]||[]).filter(c=>geo[c]);
@@ -151,8 +164,8 @@ document.addEventListener('click',async e=>{const t=e.target,r=t.dataset.r;
  if(r){route=r;fitNext=true;return render()}
  const card=t.closest('.c');if(!card||!t.dataset.a)return;const s=stores().find(x=>x.cr===card.dataset.cr)||D.addr[card.dataset.cr];
  if(t.dataset.a==='pin'){navigator.geolocation.getCurrentPosition(p=>{geo[card.dataset.cr]={lat:p.coords.latitude,lng:p.coords.longitude,src:'manual'};SV('geo2',geo);$('st').textContent='Ubicación exacta guardada';render()},gpsErr,{enableHighAccuracy:true})}
- if(t.dataset.a==='edit'){const cr=card.dataset.cr,v=prompt('Dirección o referencia de '+s.tienda+' (déjalo vacío para buscar solo por nombre):',s.dir||'');
-  if(v!==null){AD[cr]=v.trim();SV('ad',AD);if(geo[cr]&&geo[cr].src==='auto'){delete geo[cr];SV('geo2',geo)}render()}return}
+ if(t.dataset.a==='edit'){const cr=card.dataset.cr,v=prompt('Dirección, referencia o coordenadas copiadas de Google Maps (ej. 19.1234, -96.1234) de '+s.tienda+':',s.dir||'');
+  if(v!==null){const m=v.match(/^\s*(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)\s*$/);if(m){geo[cr]={lat:+m[1],lng:+m[2],src:'manual'};SV('geo2',geo);render();return}AD[cr]=v.trim();SV('ad',AD);if(geo[cr]&&geo[cr].src==='auto'){delete geo[cr];SV('geo2',geo)}render()}return}
  if(t.dataset.a==='find'){t.textContent='…';const ok=await geocode(s);$('st').textContent=ok?'Ubicada (aprox.)':'No se encontró; usa Navegar o “Estoy aquí”';render()}});
 document.addEventListener('change',e=>{const t=e.target;
  if(t.dataset.id){done[t.dataset.id]=t.checked||undefined;SV('done',done);render()}
