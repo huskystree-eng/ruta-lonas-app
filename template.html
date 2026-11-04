@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Recorrido Lonas P12</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#c8102e">
+<style>
+:root{--bg:#f4f4f2;--card:#fff;--tx:#1b1b1b;--mut:#666;--bd:#ddd;--ac:#c8102e;--hnk:#0a7d36;--mod:#a67c00;--kof:#c8102e}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--card:#202020;--tx:#eee;--mut:#999;--bd:#383838;--hnk:#3fbf6a;--mod:#e0b43a;--kof:#ff6b6b}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.4 system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:5;background:var(--ac);color:#fff;padding:calc(8px + env(safe-area-inset-top)) 12px 8px}
+h1{font-size:17px;margin:0 0 6px;display:flex;justify-content:space-between;gap:8px}
+.bar{height:6px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:#fff}
+.tabs,.tools{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 0}
+button,select,input[type=search]{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:7px 10px}
+button.on{background:var(--ac);color:#fff;border-color:var(--ac)}button{white-space:nowrap}
+.tools{padding-bottom:4px}input[type=search]{flex:1;min-width:120px}
+main{padding:8px 12px 40px;max-width:720px;margin:auto}
+.c{background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--bd);border-radius:10px;padding:10px;margin:8px 0}
+.c.ok{opacity:.55}.c.here{border-left-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}
+h3{margin:0;font-size:16px}h3 small{color:var(--mut);font-weight:400}
+.meta,.addr{color:var(--mut);font-size:13px}.addr{margin:2px 0 6px}
+.sp{display:flex;gap:8px;align-items:flex-start;padding:7px 8px;margin:4px 0;border-radius:8px;background:var(--bg);border-left:4px solid var(--bd)}
+.sp.Heineken{border-color:var(--hnk)}.sp.Modelo{border-color:var(--mod)}.sp.Kof{border-color:var(--kof)}
+.sp input{width:22px;height:22px;margin:0;flex:none}.sp b{font-size:15px}
+.tag{font-size:11px;padding:1px 6px;border-radius:9px;color:#fff;margin-left:4px}.tag.Heineken{background:var(--hnk)}.tag.Modelo{background:var(--mod)}.tag.Kof{background:var(--kof)}
+.vg{font-size:12px;color:var(--mut)}.vg.warn{color:var(--ac);font-weight:600}
+details{font-size:12px;color:var(--mut);margin-top:2px}
+.act{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.act button,.act a{font-size:13px;padding:6px 10px;text-decoration:none}
+a.nav{background:var(--ac);color:#fff;border-radius:8px}
+textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid var(--bd);border-radius:8px;padding:6px;background:var(--card);color:var(--tx);resize:vertical}
+#st{font-size:12px;padding:0 12px;color:var(--mut)}
+</style></head><body>
+<header>
+<h1><span>Recorrido Lonas P12</span><span id="pg"></span></h1>
+<div class="bar"><i id="pb" style="width:0"></i></div>
+</header>
+<div class="tabs" id="tabs"></div>
+<div class="tools">
+<input type="search" id="q" placeholder="Buscar tienda, CR, municipio">
+<select id="bf"><option value="">Todas</option><option>Heineken</option><option>Modelo</option><option>Kof</option></select>
+</div>
+<div class="tools">
+<button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar</button>
+</div>
+<div id="st"></div>
+<main id="list"></main>
+<script>
+const D=/*DATA*/;
+const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const SV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let done=LS('done')||{},geo=LS('geo')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='';
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const VG={Heineken:['2026-10-30','2026-11-14'],Modelo:['2026-11-05','2026-12-02'],Kof:['2026-11-05','2026-12-02']};
+function vigTxt(m){const [a,b]=VG[m],t=new Date().toISOString().slice(0,10);
+ if(t<a)return['Aún no vigente · instalar a partir del '+a.slice(8)+'/'+a.slice(5,7),1];
+ if(t>b)return['VENCIDA el '+b.slice(8)+'/'+b.slice(5,7),1];return['Vigente hasta '+b.slice(8)+'/'+b.slice(5,7),0]}
+function hav(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180,u=r(c-a),v=r(d-b),h=Math.sin(u/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(v/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const fd=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';
+const navUrl=s=>{const g=geo[s.cr];const dest=g&&g.src==='manual'?g.lat+','+g.lng:encodeURIComponent((s.dir?s.dir+', ':'OXXO '+s.tienda+', ')+(s.mpo?s.mpo+', ':'')+'Veracruz, México');return 'https://www.google.com/maps/dir/?api=1&destination='+dest+'&travelmode=driving'};
+function stores(){const m=new Map(),t=txt.toLowerCase();
+ D.recs.filter(r=>r.ruta===route&&(!brand||r.marca===brand)).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:a.dir||'',sp:[]})}m.get(r.cr).sp.push(r)});
+ let l=[...m.values()].filter(s=>!t||(s.tienda+s.cr+s.mpo+s.dir).toLowerCase().includes(t));
+ l.forEach(s=>{const g=geo[s.cr];s.d=me&&g?hav(me.lat,me.lng,g.lat,g.lng):null;s.ok=s.sp.every(x=>done[x.id])});
+ l.sort((a,b)=>(a.ok-b.ok)||(near&&me?((a.d??1e12)-(b.d??1e12)):(a.mpo.localeCompare(b.mpo)||a.tienda.localeCompare(b.tienda))));
+ return hd?l.filter(s=>!s.ok):l}
+function render(){
+ $('tabs').innerHTML=D.rutas.map(r=>{const n=D.recs.filter(x=>x.ruta===r),d=n.filter(x=>done[x.id]).length;return`<button data-r="${esc(r)}" class="${r===route?'on':''}">${esc(r)} ${d}/${n.length}</button>`}).join('');
+ const all=D.recs.length,dn=D.recs.filter(x=>done[x.id]).length;$('pg').textContent=dn+'/'+all+' espacios';$('pb').style.width=(100*dn/all)+'%';
+ $('near').classList.toggle('on',near);$('hd').classList.toggle('on',hd);$('gps').classList.toggle('on',!!watch);
+ $('list').innerHTML=stores().map(s=>{const g=geo[s.cr],here=!s.ok&&s.d!=null&&s.d<80;
+ return`<article class="c ${s.ok?'ok':''} ${here?'here':''}" data-cr="${s.cr}">
+ <h3>${esc(s.tienda)} <small>${s.cr}</small></h3>
+ <div class="meta">${esc(s.mpo)}${s.d!=null?' · <b>'+fd(s.d)+'</b>':''}${here?' · <b>📍 Estás aquí</b>':''}${g?(g.src==='manual'?' · GPS exacto':' · ubic. aprox.'):''}</div>
+ <div class="addr">${s.dir?esc(s.dir):'Sin dirección en el archivo: se busca por nombre'}</div>
+ ${s.sp.map(x=>{const[v,w]=vigTxt(x.marca);return`<label class="sp ${x.marca}"><input type="checkbox" data-id="${x.id}" ${done[x.id]?'checked':''}>
+ <span><b>${x.tipo.toUpperCase()} ${x.medida.replace(/ x /,' × ')} m</b><span class="tag ${x.marca}">${x.marca}</span><br>
+ <span class="vg ${w?'warn':''}">${v}${x.orig!==x.medida?' · medida original '+esc(x.orig):''}</span>
+ <details><summary>Promoción a colocar</summary>${esc(x.promo)}</details></span></label>`}).join('')}
+ <div class="act"><a class="nav" target="_blank" rel="noopener" href="${navUrl(s)}">🧭 Navegar</a><button data-a="pin">📌 Estoy aquí</button><button data-a="find">Ubicar</button></div>
+ <textarea rows="1" data-n="${s.cr}" placeholder="Notas (ej. no había espacio, foto pendiente)">${esc(notes[s.cr]||'')}</textarea></article>`}).join('')||'<p>Sin resultados.</p>'}
+function gpsErr(e){$('st').textContent='GPS: '+(e.code===1?'permiso denegado, actívalo en el navegador':'no disponible')}
+$('gps').onclick=()=>{if(watch){navigator.geolocation.clearWatch(watch);watch=null;me=null;$('st').textContent='';return render()}
+ if(!navigator.geolocation)return $('st').textContent='Este dispositivo no tiene GPS';
+ watch=navigator.geolocation.watchPosition(p=>{me={lat:p.coords.latitude,lng:p.coords.longitude};$('st').textContent='GPS activo · precisión ±'+Math.round(p.coords.accuracy)+' m';render()},e=>{watch=null;gpsErr(e);render()},{enableHighAccuracy:true,maximumAge:5000});render()};
+$('near').onclick=()=>{near=!near;if(near&&!me)$('st').textContent='Activa el GPS para ordenar por cercanía';render()};
+$('hd').onclick=()=>{hd=!hd;render()};
+$('q').oninput=e=>{txt=e.target.value;render()};$('bf').onchange=e=>{brand=e.target.value;render()};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function geocode(s){const mp=s.mpo?s.mpo+', ':'',qs=[];
+ if(s.dir)qs.push(s.dir+', '+mp+'Veracruz, México');
+ qs.push('OXXO '+s.tienda.replace(/\b(VER|JAL|MTT)\b/g,'').trim()+', '+mp+'Veracruz, México');
+ for(const q of qs){try{const r=await(await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=mx&q='+encodeURIComponent(q))).json();
+  if(r[0]){geo[s.cr]={lat:+r[0].lat,lng:+r[0].lon,src:'auto'};SV('geo',geo);return true}}catch(e){}await sleep(1100)}return false}
+$('geoall').onclick=async()=>{const l=stores().filter(s=>!geo[s.cr]);let ok=0;
+ for(let i=0;i<l.length;i++){$('st').textContent='Ubicando '+(i+1)+'/'+l.length+'… (necesita internet)';if(await geocode(l[i]))ok++;await sleep(1100)}
+ $('st').textContent='Ubicadas '+ok+' de '+l.length+'. Son aproximadas: usa “Estoy aquí” en la tienda para fijar la exacta.';render()};
+$('csv').onclick=()=>{const c=v=>'"'+String(v).replace(/"/g,'""')+'"';
+ const rows=[['Ruta','CR','Tienda','Municipio','Tipo','Marca','Medida','Hecho','Notas'],...D.recs.map(x=>[x.ruta,x.cr,x.tienda,x.mpo||(D.addr[x.cr]||{}).mpo||'',x.tipo,x.marca,x.medida,done[x.id]?'SI':'NO',notes[x.cr]||''])];
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+rows.map(r=>r.map(c).join(',')).join('\n')],{type:'text/csv'}));a.download='avance_recorrido.csv';a.click()};
+document.addEventListener('click',async e=>{const t=e.target,r=t.dataset.r;
+ if(r){route=r;return render()}
+ const card=t.closest('.c');if(!card||!t.dataset.a)return;const s=stores().find(x=>x.cr===card.dataset.cr)||D.addr[card.dataset.cr];
+ if(t.dataset.a==='pin'){navigator.geolocation.getCurrentPosition(p=>{geo[card.dataset.cr]={lat:p.coords.latitude,lng:p.coords.longitude,src:'manual'};SV('geo',geo);$('st').textContent='Ubicación exacta guardada';render()},gpsErr,{enableHighAccuracy:true})}
+ if(t.dataset.a==='find'){t.textContent='…';const ok=await geocode(s);$('st').textContent=ok?'Ubicada (aprox.)':'No se encontró; usa Navegar o “Estoy aquí”';render()}});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.id){done[t.dataset.id]=t.checked||undefined;SV('done',done);render()}
+ if(t.dataset.n){notes[t.dataset.n]=t.value;SV('notes',notes)}});
+render();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
