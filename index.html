@@ -52,7 +52,7 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 <select id="bf"><option value="">Todas</option><option>Heineken</option><option>Modelo</option><option>Kof</option></select>
 </div>
 <div class="tools">
-<button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="rp">📸 Informe con fotos</button><button id="mt">🧰 Material</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden><input type="file" id="cam" accept="image/*" capture="environment" hidden>
+<button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="rp">📸 Informe con fotos</button><button id="gh">⚙ GitHub</button><button id="mt">🧰 Material</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden><input type="file" id="cam" accept="image/*" capture="environment" hidden>
 </div>
 <div class="tools">
 <button id="vw">🗺️ Mapa</button><button id="gmr">🧭 Ruta en Google Maps</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar avance</button>
@@ -240,9 +240,26 @@ $('rp').onclick=async()=>{const rows=[];
  if(!rows.length)return $('st').textContent='Aún no hay espacios hechos ni fotos para el informe.';
  try{$('st').textContent='Generando informe con '+rows.reduce((n,r)=>n+(r.a?1:0)+(r.d?1:0),0)+' fotos…';
  const buf=await buildReport(rows,D.rutas),name='Seguimiento_Lonas_P12_'+new Date().toISOString().slice(0,10)+'.xlsx',f=new File([buf],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+ if(ghCfg()){try{$('st').textContent='Subiendo informe a GitHub…';const u=await ghPut(f,name);$('st').textContent='✅ Informe guardado en tu repositorio de GitHub: '+u.path+' ('+rows.length+' espacios, '+(f.size/1048576).toFixed(1)+' MB). Haz «git pull» en tu carpeta para verlo.';return}catch(e){$('st').textContent='No se pudo subir a GitHub ('+(e&&e.message||e)+'). Se descarga en el celular.'}}
  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Seguimiento Lonas P12'});$('st').textContent='Informe listo ('+rows.length+' espacios).';return}catch(e){}}
  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=name;a.click();$('st').textContent='Informe descargado: '+name+' ('+rows.length+' espacios, '+(f.size/1048576).toFixed(1)+' MB).'
  }catch(e){$('st').textContent='No se pudo generar el informe: '+(e&&e.message||e)}};
+
+/*GITHUB*/
+const GHK='lonas_gh',ghCfg=()=>{try{const c=JSON.parse(localStorage.getItem(GHK)||'null');return c&&c.token&&c.owner&&c.repo?c:null}catch(e){return null}};
+async function ghPut(f,name){const c=ghCfg(),path=(c.dir?c.dir.replace(/^\/+|\/+$/g,'')+'/':'')+name,url='https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+path.split('/').map(encodeURIComponent).join('/'),H={Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'};
+ const bytes=new Uint8Array(await f.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=32768)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+32768));
+ let sha;const g=await fetch(url+'?ref='+encodeURIComponent(c.branch||'main'),{headers:H});if(g.ok)sha=(await g.json()).sha;else if(g.status===401||g.status===403)throw new Error('token sin permiso (Contents: Read and write)');
+ const r=await fetch(url,{method:'PUT',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({message:'Informe con evidencia fotográfica '+name,content:btoa(s),branch:c.branch||'main',sha})});
+ if(!r.ok){let m=r.status;try{m=(await r.json()).message||m}catch(e){}throw new Error(m)}return{path}}
+$('gh').onclick=()=>{const c=ghCfg()||{},h=location.hostname.endsWith('github.io')?location.hostname.split('.')[0]:'',p=location.pathname.split('/')[1]||'';
+ const owner=prompt('Usuario u organización de GitHub:',c.owner||h);if(owner===null)return;
+ const repo=prompt('Nombre del repositorio:',c.repo||p);if(repo===null)return;
+ const branch=prompt('Rama (branch):',c.branch||'main');if(branch===null)return;
+ const dir=prompt('Carpeta dentro del repositorio donde se guardan los informes:',c.dir===undefined?'evidencias':c.dir);if(dir===null)return;
+ const token=prompt('Token de GitHub (fine-grained, solo este repositorio, permiso Contents: Read and write). Deja vacío para borrar la configuración:',c.token||'');if(token===null)return;
+ try{if(!token.trim())localStorage.removeItem(GHK);else localStorage.setItem(GHK,JSON.stringify({owner:owner.trim(),repo:repo.trim(),branch:branch.trim()||'main',dir:dir.trim(),token:token.trim()}))}catch(e){}
+ $('st').textContent=ghCfg()?'GitHub configurado: los informes se guardarán en '+owner.trim()+'/'+repo.trim()+'/'+dir.trim():'Configuración de GitHub borrada: los informes se descargan en el celular.'};
 function updateMe(){if(!map)return;if(!me){if(meMk){meMk.remove();meMk=null}return}
  if(meMk)meMk.setLatLng([me.lat,me.lng]);else meMk=L.circleMarker([me.lat,me.lng],{radius:8,color:'#fff',weight:3,fillColor:'#1a73e8',fillOpacity:1}).addTo(map)}
 window.doneAll=cr=>{D.recs.filter(r=>r.ruta===route&&r.cr===cr).forEach(r=>done[r.id]=true);SV('done',done);map.closePopup();render()};
