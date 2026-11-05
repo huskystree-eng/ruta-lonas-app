@@ -23,12 +23,15 @@ main{padding:8px 12px 40px;max-width:720px;margin:auto}
 .c.ok{opacity:.55}.c.here{border-left-color:var(--ac);box-shadow:0 0 0 2px var(--ac)}
 h3{margin:0;font-size:16px}h3 small{color:var(--mut);font-weight:400}
 .meta,.addr{color:var(--mut);font-size:13px}.addr{margin:2px 0 6px}
-.sp{display:flex;gap:8px;align-items:flex-start;padding:7px 8px;margin:4px 0;border-radius:8px;background:var(--bg);border-left:4px solid var(--bd)}
-.sp.Heineken{border-color:var(--hnk)}.sp.Modelo{border-color:var(--mod)}.sp.Kof{border-color:var(--kof)}
+.sw{margin:4px 0;border-radius:8px;background:var(--bg);border-left:4px solid var(--bd)}
+.sw.Heineken{border-color:var(--hnk)}.sw.Modelo{border-color:var(--mod)}.sw.Kof{border-color:var(--kof)}
+.sp{display:flex;gap:8px;align-items:flex-start;padding:7px 8px}
+.ph{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:0 8px 8px 38px}.ph button{font-size:12px;padding:5px 8px}.th{height:54px;width:54px;object-fit:cover;border-radius:6px;border:2px solid var(--ac)}.ph small{color:var(--mut);font-size:11px}
+#ov{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px}#ov img{max-width:100%;max-height:75vh;border-radius:6px}
 .sp input{width:22px;height:22px;margin:0;flex:none}.sp b{font-size:15px}
 .tag{background:#555;font-size:11px;padding:1px 6px;border-radius:9px;color:#fff;margin-left:4px}.tag.Heineken{background:var(--hnk)}.tag.Modelo{background:var(--mod)}.tag.Kof{background:var(--kof)}
 .vg{font-size:12px;color:var(--mut)}.vg.warn{color:var(--ac);font-weight:600}
-details{font-size:12px;color:var(--mut);margin-top:2px}
+details{font-size:12px;color:var(--mut);margin-top:2px}details.hc{color:var(--tx);margin-top:4px}
 .act{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.act button,.act a{font-size:13px;padding:6px 10px;text-decoration:none}
 a.nav{background:var(--ac);color:#fff;border-radius:8px}
 textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid var(--bd);border-radius:8px;padding:6px;background:var(--card);color:var(--tx);resize:vertical}
@@ -48,17 +51,19 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 <select id="bf"><option value="">Todas</option><option>Heineken</option><option>Modelo</option><option>Kof</option></select>
 </div>
 <div class="tools">
-<button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden>
+<button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="rp">📸 Informe con fotos</button><button id="mt">🧰 Material</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden><input type="file" id="cam" accept="image/*" capture="environment" hidden>
 </div>
 <div class="tools">
 <button id="vw">🗺️ Mapa</button><button id="gmr">🧭 Ruta en Google Maps</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar avance</button>
 </div>
+<div id="ov" hidden><img id="ovi"><div><button id="ovr">📷 Repetir</button> <button id="ovd">🗑 Borrar</button> <button id="ovc">Cerrar</button></div></div>
 <div id="st"></div>
 <div id="td" class="td" hidden></div>
 <div id="map" hidden></div>
 <main id="list"></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="xlsx.full.min.js"></script>
+<script src="exceljs.min.js"></script>
 <script>
 const D0=/*DATA*/;
 const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
@@ -92,11 +97,11 @@ function render(){
  return`<article class="c ${s.ok?'ok':''} ${here?'here':''}" data-cr="${s.cr}">
  <h3>${ix(s)<9999?'#'+(ix(s)+1)+' ':''}${esc(s.tienda)} <small>${s.cr}</small></h3>
  <div class="meta">${esc(s.mpo)}${s.d!=null?' · <b>'+fd(s.d)+'</b>':''}${here?' · <b>📍 Estás aquí</b>':''}${g?(g.src==='manual'?' · GPS exacto':(g.lvl<=2?' · ubic. buena':' · ⚠ ubic. aproximada')):''}</div>
- <div class="addr">${s.dir?esc(s.dir):'Sin dirección en el archivo: se busca por nombre'}</div>
- ${s.sp.map(x=>{const[v,w]=vigTxt(x);return`<label class="sp ${x.marca}"><input type="checkbox" data-id="${x.id}" ${done[x.id]?'checked':''}>
+ <div class="addr">${s.dir?esc(s.dir):'Sin dirección en el archivo: se busca por nombre'}</div>${(D.addr[s.cr]||{}).obs?'<div class="addr">📝 '+esc(D.addr[s.cr].obs)+'</div>':''}
+ ${s.sp.map(x=>{const[v,w]=vigTxt(x);return`<div class="sw ${x.marca}"><label class="sp"><input type="checkbox" data-id="${x.id}" ${done[x.id]?'checked':''}>
  <span><b>${x.tipo.toUpperCase()} ${x.medida.replace(/ x /,' × ')} m</b><span class="tag ${x.marca}">${x.marca}</span><br>
  <span class="vg ${w?'warn':''}">${v}${x.orig!==x.medida?' · medida original '+esc(x.orig):''}</span>
- <details><summary>Promoción a colocar</summary>${esc(x.promo)}</details></span></label>`}).join('')}
+ <details><summary>Promoción a colocar</summary>${esc(x.promo)}</details>${x.ins||x.mat||x.acs?`<details class="hc" open><summary>🛠 ${esc(x.acc||'Instalar')}: qué hacer y material</summary>${x.ins?esc(x.ins)+'<br>':''}${x.mat?'<b>Material:</b> '+esc(x.mat)+'<br>':''}${x.acs?'<b>Accesorios:</b> '+esc(x.acs):''}</details>`:''}</span></label>${phRow(x)}</div>`}).join('')}
  <div class="act"><a class="nav" target="_blank" rel="noopener" href="${navUrl(s)}">🧭 Navegar</a><a class="nav" style="background:#555" target="_blank" rel="noopener" href="${navUrl(s,'o')}">🔎 Buscar OXXO</a><button data-a="pin">📌 Estoy aquí</button><button data-a="find">Ubicar</button><button data-a="edit">✏️ Dirección</button></div>
  <textarea rows="1" data-n="${s.cr}" placeholder="Notas (ej. no había espacio, foto pendiente)">${esc(notes[s.cr]||'')}</textarea></article>`}).join('')||'<p>Sin resultados.</p>';drawMap()}
 function gpsErr(e){$('st').textContent='GPS: '+(e.code===1?'permiso denegado, actívalo en el navegador':'no disponible')}
@@ -141,7 +146,10 @@ $('plan').onclick=async()=>{
   if(j.code==='Ok'){ord=j.waypoints.map((w,i)=>[w.waypoint_index,i]).sort((a,b)=>a[0]-b[0]).map(x=>pts[x[1]]).filter(p=>!p.me).map(p=>p.cr);RL[route]=j.trips[0].geometry.coordinates.map(c=>[c[1],c[0]]);info=' · '+Math.round(j.trips[0].distance/1000)+' km · '+Math.round(j.trips[0].duration/60)+' min en auto'}}catch(e){}}
  if(!ord){let cur=me||ps[0],rest=ps.slice(),o=[];while(rest.length){let bi=0,bd=1e18;rest.forEach((p,i)=>{const d=hav(cur.lat,cur.lng,p.lat,p.lng);if(d<bd){bd=d;bi=i}});cur=rest.splice(bi,1)[0];o.push(cur.cr)}ord=o;info=' · orden por cercanía (sin conexión a rutas)'}
  P[route]=ord;SV('plan',P);near=false;fitNext=true;$('st').textContent='Ruta: '+ord.length+' paradas'+info+(rs().some(s=>!geo[s.cr])?' · '+rs().filter(s=>!geo[s.cr]).length+' sin coordenadas (no incluidas)':'');render()};
-$('gmr').onclick=()=>{const td=$('td');if(!td.hidden){td.hidden=true;return}
+$('mt').onclick=()=>{const td=$('td');if(!td.hidden&&td.dataset.k==='m'){td.hidden=true;return}td.dataset.k='m';const c={};
+ D.recs.filter(r=>r.ruta===route&&!done[r.id]).forEach(r=>[r.mat].concat(String(r.acs||'').split(/[;\n]/)).forEach(x=>{x=String(x||'').trim();if(x)c[x]=(c[x]||0)+1}));
+ const l=Object.entries(c).sort((a,b)=>b[1]-a[1]);td.hidden=false;td.innerHTML='<b>🧰 Material pendiente · '+esc(route)+'</b>'+(l.length?'<p>'+l.map(([k,v])=>'• '+esc(k)+' <b>×'+v+'</b>').join('<br>')+'</p>':'<p>Sin material registrado en esta ruta.</p>')};
+$('gmr').onclick=()=>{const td=$('td');if(!td.hidden&&td.dataset.k==='g'){td.hidden=true;return}td.dataset.k='g';
  const l=rs().filter(s=>!D.recs.filter(r=>r.ruta===route&&r.cr===s.cr).every(r=>done[r.id])),cp=s=>(s.dir?parse(s.dir).cp:'')||'99999',px=s=>{const i=(P[route]||[]).indexOf(s.cr);return i<0?9999:i};
  l.sort((a,b)=>P[route]?px(a)-px(b):(a.mpo.toUpperCase().localeCompare(b.mpo.toUpperCase())||cp(a).localeCompare(cp(b))||a.tienda.localeCompare(b.tienda)));
  td.hidden=false;if(!l.length){td.textContent='No hay tiendas pendientes en esta ruta';return}
@@ -155,14 +163,17 @@ const BR=s=>{const l=s.toLowerCase();return l.startsWith('hei')?'Heineken':l.sta
 function coord(c){c=String(c||'');let m=c.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||c.match(/(-?\d{1,3}\.\d+)\s*[,; ]\s*(-?\d{1,3}\.\d+)/);if(!m)return null;let a=+m[1],b=+m[2];if(a<-50&&b>0)[a,b]=[b,a];return a>14&&a<33&&b<-86&&b>-118?{lat:a,lng:b}:'bad'}
 function fillBrands(){$('bf').innerHTML='<option value="">Todas</option>'+[...new Set(D.recs.map(r=>r.marca))].map(x=>'<option>'+esc(x)+'</option>').join('')}
 async function loadXlsx(file){try{
- const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true}),ws=wb.Sheets.Recorrido||wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+ const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true}),ws=wb.Sheets.Recorrido||wb.Sheets[wb.SheetNames.find(n=>fx(n)==='recorrido')||wb.SheetNames[0]],A=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+ const hi=A.findIndex(r=>{const f=r.map(fx);return f.includes('cr')&&f.includes('ruta')});
+ if(hi<0)return $('st').textContent='No encontré los encabezados (Ruta, CR, Tienda…). Usa la plantilla.';
  const get=(r,f)=>{for(const k in r)if(f(fx(k)))return r[k];return''},S=(r,f)=>String(get(r,f)).trim();
+ const rows=A.slice(hi+1).map(a=>{const o={};A[hi].forEach((h,i)=>{if(h!=='')o[h]=a[i]});return o}).filter(o=>/^[A-Z0-9]{3,10}$/i.test(S(o,k=>k==='cr')));
  const recs=[],addr={},ng={},ord={},rutas=[];let bad=0;
  rows.forEach(r=>{const cr=S(r,k=>k==='cr').toUpperCase(),ruta=S(r,k=>k==='ruta'),marca=BR(S(r,k=>k==='marca'));if(!cr||!ruta||!marca)return;
   if(!rutas.includes(ruta))rutas.push(ruta);
   const med=S(r,k=>k.startsWith('medida')&&!k.includes('original')).replace(/×/g,'x'),dir=S(r,k=>k==='direccion'),mpo=S(r,k=>k==='municipio');
-  recs.push({ruta,marca,cr,tienda:S(r,k=>k==='tienda'),mpo,tipo:S(r,k=>k==='tipo')||'Lona',medida:med,orig:S(r,k=>k.startsWith('medidaoriginal'))||med,promo:S(r,k=>k.startsWith('promo')),desde:ds(get(r,k=>k.startsWith('vigenciadesde'))),hasta:ds(get(r,k=>k.startsWith('vigenciahasta')))});
-  if(!addr[cr]||(dir&&!addr[cr].dir))addr[cr]={dir,mpo};
+  recs.push({ruta,marca,cr,tienda:S(r,k=>k==='tienda'),mpo,tipo:S(r,k=>k==='tipo')||'Lona',medida:med,orig:S(r,k=>k.startsWith('medidaoriginal'))||med,promo:S(r,k=>k.startsWith('promo')),desde:ds(get(r,k=>k.startsWith('vigenciadesde'))),hasta:ds(get(r,k=>k.startsWith('vigenciahasta'))),acc:S(r,k=>k==='accion')||'Instalar',ins:S(r,k=>k.startsWith('quehacer')),mat:S(r,k=>k.startsWith('materialpieza')),acs:S(r,k=>k.startsWith('accesorios'))});
+  const obs=S(r,k=>k.startsWith('observ'));if(!addr[cr]||(dir&&!addr[cr].dir))addr[cr]={dir,mpo,obs};else if(obs&&!addr[cr].obs)addr[cr].obs=obs;
   const c=coord(get(r,k=>k.startsWith('coord')));if(c==='bad')bad++;else if(c)ng[cr]={lat:c.lat,lng:c.lng,src:'manual'};
   const o=parseFloat(get(r,k=>k==='orden'));if(!isNaN(o)){const key=ruta+'|'+cr;ord[key]=Math.min(ord[key]??1e9,o)}});
  if(!recs.length)return $('st').textContent='No encontré filas válidas. Revisa que existan las columnas Ruta, CR, Tienda, Marca, Tipo y Medida.';
@@ -177,9 +188,60 @@ async function loadXlsx(file){try{
  }catch(e){$('st').textContent='No se pudo leer el Excel: '+e.message}}
 $('xl').onclick=()=>$('xf').click();$('xf').onchange=e=>{if(e.target.files[0])loadXlsx(e.target.files[0]);e.target.value=''};
 $('xe').onclick=()=>{const rows=[];D.rutas.forEach(ru=>D.recs.filter(r=>r.ruta===ru).forEach(r=>{const a=D.addr[r.cr]||{},g=geo[r.cr],o=(P[ru]||[]).indexOf(r.cr);
- rows.push({'Ruta':ru,'CR':r.cr,'Tienda':r.tienda,'Municipio':r.mpo||a.mpo||'','Dirección':AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),'Coordenadas (pegar de Google Maps)':g&&g.src==='manual'?g.lat.toFixed(6)+', '+g.lng.toFixed(6):'','Orden':o<0?'':o+1,'Marca':r.marca,'Tipo':r.tipo,'Medida (m)':r.medida,'Medida original':r.orig,'Promoción':r.promo,'Vigencia desde':r.desde||(VG[r.marca]||[])[0]||'','Vigencia hasta':r.hasta||(VG[r.marca]||[])[1]||''})}));
+ rows.push({'Ruta':ru,'CR':r.cr,'Tienda':r.tienda,'Municipio':r.mpo||a.mpo||'','Dirección':AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),'Coordenadas (pegar de Google Maps)':g&&g.src==='manual'?g.lat.toFixed(6)+', '+g.lng.toFixed(6):'','Orden':o<0?'':o+1,'Marca':r.marca,'Tipo':r.tipo,'Medida (m)':r.medida,'Medida original':r.orig,'Promoción':r.promo,'Vigencia desde':r.desde||(VG[r.marca]||[])[0]||'','Vigencia hasta':r.hasta||(VG[r.marca]||[])[1]||'','Acción':r.acc||'Instalar','Qué hacer en el lugar':r.ins||'','Material (pieza)':r.mat||'','Accesorios y herramientas':r.acs||'','Observaciones de la tienda':a.obs||''})}));
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Recorrido');XLSX.writeFile(wb,'Recorrido_actual.xlsx')};
 $('orig').onclick=()=>{if(confirm('¿Volver a los datos originales? Se borra el avance, las notas y lo cargado desde Excel.')){['data','done','geo','geo2','plan','ad','notes'].forEach(k=>localStorage.removeItem(k));location.reload()}};
+const PH={},phk=x=>x.cr+'|'+x.marca+'|'+x.tipo+'|'+x.medida;let idbOk=true;
+const DB=new Promise((ok,no)=>{try{const q=indexedDB.open('lonas',1);q.onupgradeneeded=()=>q.result.createObjectStore('f');q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)}catch(e){no(e)}});
+const dbSet=(k,v)=>DB.then(db=>new Promise((ok,no)=>{const t=db.transaction('f','readwrite');v===null?t.objectStore('f').delete(k):t.objectStore('f').put(v,k);t.oncomplete=ok;t.onerror=()=>no(t.error)}));
+DB.then(db=>{const c=db.transaction('f').objectStore('f').openCursor(),o={};c.onsuccess=()=>{const x=c.result;if(x){o[x.key]=x.value;x.continue()}else{for(const k in o)PH[k]={...o[k],url:URL.createObjectURL(o[k].blob)};render()}}}).catch(()=>{idbOk=false});
+const phRow=x=>{const k=phk(x);return'<div class="ph">'+[['a','Antes'],['d','Después']].map(([s,n])=>PH[k+'|'+s]?'<img class="th" data-v="'+esc(k+'|'+s)+'" src="'+PH[k+'|'+s].url+'" alt="'+n+'"><small>'+n+'</small>':'<button data-p="'+esc(k+'|'+s)+'">📷 '+n+'</button>').join(' ')+'</div>'};
+const fdt=ts=>new Date(ts).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'});
+async function addPhoto(key,file){const[cr,marca,tipo,medida,slot]=key.split('|'),rec=D.recs.find(r=>phk(r)+'|'+slot===key);if(!rec)return;
+ try{$('st').textContent='Procesando foto…';
+ const img=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=URL.createObjectURL(file)}),sc=Math.min(1,1024/Math.max(img.naturalWidth,img.naturalHeight)),w=Math.round(img.naturalWidth*sc),h=Math.round(img.naturalHeight*sc),c=document.createElement('canvas');
+ c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(img,0,0,w,h);URL.revokeObjectURL(img.src);
+ let pos=me;if(!pos&&navigator.geolocation)pos=await new Promise(r=>navigator.geolocation.getCurrentPosition(p=>r({lat:p.coords.latitude,lng:p.coords.longitude}),()=>r(null),{timeout:4000,maximumAge:60000}));
+ const ts=new Date().toISOString(),bh=Math.max(16,Math.round(w/40));
+ g.fillStyle='rgba(0,0,0,.65)';g.fillRect(0,h-bh*1.7,w,bh*1.7);g.fillStyle='#fff';g.font=bh+'px sans-serif';g.textBaseline='middle';
+ g.fillText((slot==='a'?'ANTES':'DESPUÉS')+' · '+rec.tienda+' ('+cr+') · '+fdt(ts)+(pos?' · '+pos.lat.toFixed(5)+', '+pos.lng.toFixed(5):''),8,h-bh*.85,w-16);
+ const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.7)),v={blob,ts,w,h,lat:pos?pos.lat:null,lng:pos?pos.lng:null};
+ if(PH[key])URL.revokeObjectURL(PH[key].url);PH[key]={...v,url:URL.createObjectURL(blob)};
+ try{await dbSet(key,v)}catch(e){idbOk=false}
+ if(slot==='d'){done[rec.id]=true;SV('done',done)}
+ $('st').textContent='Foto guardada'+(slot==='d'?' y espacio marcado como hecho':'')+(idbOk?'':' (aviso: este navegador no permite guardarla; descarga el informe antes de cerrar)')+'.';render()
+ }catch(e){$('st').textContent='No se pudo procesar la foto: '+(e&&e.message||e)}}
+$('cam').onchange=e=>{const f=e.target.files[0],k=$('cam').dataset.k;e.target.value='';if(f&&k)addPhoto(k,f)};
+document.addEventListener('click',e=>{const t=e.target;
+ if(t.dataset.p){$('cam').dataset.k=t.dataset.p;$('cam').click()}
+ if(t.dataset.v){$('ov').dataset.k=t.dataset.v;$('ovi').src=PH[t.dataset.v].url;$('ov').hidden=false}});
+$('ovc').onclick=()=>{$('ov').hidden=true};
+$('ovr').onclick=()=>{const k=$('ov').dataset.k;$('ov').hidden=true;$('cam').dataset.k=k;$('cam').click()};
+$('ovd').onclick=async()=>{const k=$('ov').dataset.k;if(!confirm('¿Borrar esta foto?'))return;URL.revokeObjectURL(PH[k].url);delete PH[k];try{await dbSet(k,null)}catch(e){}$('ov').hidden=true;render()};
+/*REPORT*/
+const b64=b=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=no;r.readAsDataURL(b)});
+async function buildReport(rows,rutas){
+ const wb=new ExcelJS.Workbook(),rs_=wb.addWorksheet('Resumen'),ws=wb.addWorksheet('Seguimiento',{views:[{state:'frozen',ySplit:1}]}),RED='FFC8102E',nf=ts=>ts?new Date(ts).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'}):'';
+ rs_.columns=[{width:30},{width:14},{width:14},{width:14},{width:14}];
+ rs_.addRow(['Informe de seguimiento · Lonas y pendones P12']).font={bold:true,size:14};rs_.addRow(['Generado',nf(new Date().toISOString())]);rs_.addRow([]);
+ const h=rs_.addRow(['Ruta','Espacios','Completados','Con foto antes','Con foto después']);h.eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:RED}}});
+ const tot=[0,0,0,0];rutas.forEach(ru=>{const l=rows.filter(r=>r.ruta===ru),v=[l.length,l.filter(r=>r.done).length,l.filter(r=>r.a).length,l.filter(r=>r.d).length];v.forEach((x,i)=>tot[i]+=x);rs_.addRow([ru,...v])});
+ rs_.addRow(['TOTAL',...tot]).font={bold:true};rs_.addRow([]);rs_.addRow(['Nota: este resumen cuenta solo los espacios incluidos en el informe (con foto o marcados como hechos).']).font={italic:true,color:{argb:'FF7F7F7F'}};
+ ws.columns=[['Ruta',20],['CR',9],['Tienda',24],['Municipio',16],['Dirección',36],['Marca',11],['Tipo',9],['Medida (m)',12],['Promoción',40],['Estado',13],['Fecha y hora',17],['GPS (lat, lng)',22],['Notas',28],['Foto ANTES',34],['Foto DESPUÉS',34]].map(([header,width])=>({header,width}));
+ ws.getRow(1).eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:RED}};c.alignment={vertical:'middle',horizontal:'center',wrapText:true}});ws.getRow(1).height=24;
+ for(const r of rows){const p=r.d||r.a,row=ws.addRow([r.ruta,r.cr,r.tienda,r.mpo,r.dir,r.marca,r.tipo,r.medida,r.promo,r.done?'COMPLETADO':'EN PROCESO',nf(p&&p.ts),p&&p.lat!=null?p.lat.toFixed(6)+', '+p.lng.toFixed(6):'',r.nota,'','']);
+  row.alignment={vertical:'top',wrapText:true};row.getCell(10).font={bold:true,color:{argb:r.done?'FF2E7D32':'FFB26A00'}};let hpt=30;
+  for(const[i,p2]of[[13,r.a],[14,r.d]]){if(!p2)continue;const id=wb.addImage({base64:p2.b64||await b64(p2.blob),extension:'jpeg'}),W=240,H=Math.round(W*p2.h/p2.w);ws.addImage(id,{tl:{col:i+.05,row:row.number-1+.03},ext:{width:W,height:H}});hpt=Math.max(hpt,H*.75+8)}
+  row.height=Math.min(hpt,400)}
+ return wb.xlsx.writeBuffer()}
+$('rp').onclick=async()=>{const rows=[];
+ D.recs.forEach(x=>{const k=phk(x),a=PH[k+'|a'],d=PH[k+'|d'];if(!done[x.id]&&!a&&!d)return;const ad=D.addr[x.cr]||{};rows.push({ruta:x.ruta,cr:x.cr,tienda:x.tienda,mpo:x.mpo||ad.mpo||'',dir:AD[x.cr]!==undefined?AD[x.cr]:(ad.dir||''),marca:x.marca,tipo:x.tipo,medida:x.medida,promo:x.promo,done:!!done[x.id],a,d,nota:notes[x.cr]||''})});
+ if(!rows.length)return $('st').textContent='Aún no hay espacios hechos ni fotos para el informe.';
+ try{$('st').textContent='Generando informe con '+rows.reduce((n,r)=>n+(r.a?1:0)+(r.d?1:0),0)+' fotos…';
+ const buf=await buildReport(rows,D.rutas),name='Seguimiento_Lonas_P12_'+new Date().toISOString().slice(0,10)+'.xlsx',f=new File([buf],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Seguimiento Lonas P12'});$('st').textContent='Informe listo ('+rows.length+' espacios).';return}catch(e){}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=name;a.click();$('st').textContent='Informe descargado: '+name+' ('+rows.length+' espacios, '+(f.size/1048576).toFixed(1)+' MB).'
+ }catch(e){$('st').textContent='No se pudo generar el informe: '+(e&&e.message||e)}};
 function updateMe(){if(!map)return;if(!me){if(meMk){meMk.remove();meMk=null}return}
  if(meMk)meMk.setLatLng([me.lat,me.lng]);else meMk=L.circleMarker([me.lat,me.lng],{radius:8,color:'#fff',weight:3,fillColor:'#1a73e8',fillOpacity:1}).addTo(map)}
 window.doneAll=cr=>{D.recs.filter(r=>r.ruta===route&&r.cr===cr).forEach(r=>done[r.id]=true);SV('done',done);map.closePopup();render()};
