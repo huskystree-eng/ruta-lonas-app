@@ -26,7 +26,7 @@ h3{margin:0;font-size:16px}h3 small{color:var(--mut);font-weight:400}
 .sp{display:flex;gap:8px;align-items:flex-start;padding:7px 8px;margin:4px 0;border-radius:8px;background:var(--bg);border-left:4px solid var(--bd)}
 .sp.Heineken{border-color:var(--hnk)}.sp.Modelo{border-color:var(--mod)}.sp.Kof{border-color:var(--kof)}
 .sp input{width:22px;height:22px;margin:0;flex:none}.sp b{font-size:15px}
-.tag{font-size:11px;padding:1px 6px;border-radius:9px;color:#fff;margin-left:4px}.tag.Heineken{background:var(--hnk)}.tag.Modelo{background:var(--mod)}.tag.Kof{background:var(--kof)}
+.tag{background:#555;font-size:11px;padding:1px 6px;border-radius:9px;color:#fff;margin-left:4px}.tag.Heineken{background:var(--hnk)}.tag.Modelo{background:var(--mod)}.tag.Kof{background:var(--kof)}
 .vg{font-size:12px;color:var(--mut)}.vg.warn{color:var(--ac);font-weight:600}
 details{font-size:12px;color:var(--mut);margin-top:2px}
 .act{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.act button,.act a{font-size:13px;padding:6px 10px;text-decoration:none}
@@ -48,26 +48,30 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 <select id="bf"><option value="">Todas</option><option>Heineken</option><option>Modelo</option><option>Kof</option></select>
 </div>
 <div class="tools">
-<button id="vw">🗺️ Mapa</button><button id="gmr">🧭 Ruta en Google Maps</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar</button>
+<button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden>
+</div>
+<div class="tools">
+<button id="vw">🗺️ Mapa</button><button id="gmr">🧭 Ruta en Google Maps</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar avance</button>
 </div>
 <div id="st"></div>
 <div id="td" class="td" hidden></div>
 <div id="map" hidden></div>
 <main id="list"></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="xlsx.full.min.js"></script>
 <script>
-const D=/*DATA*/;
+const D0=/*DATA*/;
 const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 const SV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let done=LS('done')||{},geo=LS('geo2')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='',view='list',map,layer,meMk,rline,fitNext=true,P=LS('plan')||{},RL={},AD=LS('ad')||{};
+let D=LS('data')||D0,done=LS('done')||{},geo=LS('geo2')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='',view='list',map,layer,meMk,rline,fitNext=true,P=LS('plan')||{},RL={},AD=LS('ad')||{};
 {const o=LS('geo')||{};Object.keys(o).forEach(k=>{if(o[k].src==='manual'&&!geo[k])geo[k]=o[k]})}
 (D.fix||[]).forEach(c=>{if(geo[c]&&geo[c].src==='auto'){delete geo[c];SV('geo2',geo)}});
 const ix=s=>{const i=(P[route]||[]).indexOf(s.cr);return i<0?9999:i};
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VG={Heineken:['2026-10-30','2026-11-14'],Modelo:['2026-11-05','2026-12-02'],Kof:['2026-11-05','2026-12-02']};
-function vigTxt(m){const [a,b]=VG[m],t=new Date().toISOString().slice(0,10);
- if(t<a)return['Aún no vigente · instalar a partir del '+a.slice(8)+'/'+a.slice(5,7),1];
- if(t>b)return['VENCIDA el '+b.slice(8)+'/'+b.slice(5,7),1];return['Vigente hasta '+b.slice(8)+'/'+b.slice(5,7),0]}
+function vigTxt(x){const a=x.desde||(VG[x.marca]||[])[0],b=x.hasta||(VG[x.marca]||[])[1];if(!a||!b)return['',0];const t=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10),f=s=>s.slice(8)+'/'+s.slice(5,7);
+ if(t<a)return['Aún no vigente · instalar desde el '+f(a),1];
+ if(t>b)return['VENCIDA el '+f(b),1];return['Vigente hasta '+f(b),0]}
 function hav(a,b,c,d){const R=6371e3,r=x=>x*Math.PI/180,u=r(c-a),v=r(d-b),h=Math.sin(u/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(v/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
 const fd=m=>m<1000?Math.round(m)+' m':(m/1000).toFixed(1)+' km';
 const qOx=s=>'OXXO '+s.tienda.replace(/\b(VER|JAL|MTT)\b/g,'').trim()+', '+(s.mpo?s.mpo+', ':'')+'Veracruz, México';
@@ -89,7 +93,7 @@ function render(){
  <h3>${ix(s)<9999?'#'+(ix(s)+1)+' ':''}${esc(s.tienda)} <small>${s.cr}</small></h3>
  <div class="meta">${esc(s.mpo)}${s.d!=null?' · <b>'+fd(s.d)+'</b>':''}${here?' · <b>📍 Estás aquí</b>':''}${g?(g.src==='manual'?' · GPS exacto':(g.lvl<=2?' · ubic. buena':' · ⚠ ubic. aproximada')):''}</div>
  <div class="addr">${s.dir?esc(s.dir):'Sin dirección en el archivo: se busca por nombre'}</div>
- ${s.sp.map(x=>{const[v,w]=vigTxt(x.marca);return`<label class="sp ${x.marca}"><input type="checkbox" data-id="${x.id}" ${done[x.id]?'checked':''}>
+ ${s.sp.map(x=>{const[v,w]=vigTxt(x);return`<label class="sp ${x.marca}"><input type="checkbox" data-id="${x.id}" ${done[x.id]?'checked':''}>
  <span><b>${x.tipo.toUpperCase()} ${x.medida.replace(/ x /,' × ')} m</b><span class="tag ${x.marca}">${x.marca}</span><br>
  <span class="vg ${w?'warn':''}">${v}${x.orig!==x.medida?' · medida original '+esc(x.orig):''}</span>
  <details><summary>Promoción a colocar</summary>${esc(x.promo)}</details></span></label>`}).join('')}
@@ -104,7 +108,8 @@ $('hd').onclick=()=>{hd=!hd;render()};
 $('q').oninput=e=>{txt=e.target.value;render()};$('bf').onchange=e=>{brand=e.target.value;render()};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const MC=LS('mpoc')||{};
-async function nm(q,n){try{return await(await fetch('https://nominatim.openstreetmap.org/search?format=json&limit='+(n||3)+'&countrycodes=mx&q='+encodeURIComponent(q))).json()}catch(e){return[]}}
+let netFail=0;
+async function nm(q,n){const c=new AbortController(),to=setTimeout(()=>c.abort(),8000);try{const r=await(await fetch('https://nominatim.openstreetmap.org/search?format=json&limit='+(n||3)+'&countrycodes=mx&q='+encodeURIComponent(q),{signal:c.signal})).json();netFail=0;return r}catch(e){netFail++;return[]}finally{clearTimeout(to)}}
 async function anchor(mp){const k=mp.toUpperCase();if(!k)return null;if(MC[k]!==undefined)return MC[k];const r=await nm(mp+', Veracruz, México',1);await sleep(1100);MC[k]=r[0]?{lat:+r[0].lat,lng:+r[0].lon}:null;SV('mpoc',MC);return MC[k]}
 function parse(d){const u=' '+d.replace(/\s+/g,' ')+' ',m=(re)=>((u.match(re)||[])[1]||'').trim();
  return{cp:m(/\b(\d{5})\b/),
@@ -124,18 +129,18 @@ async function geocode(s){const mp=s.mpo||'',a=await anchor(mp),p=s.dir?parse(s.
  if(a){geo[s.cr]={lat:a.lat,lng:a.lng,src:'auto',lvl:6};SV('geo2',geo);return true}return false}
 const rs=()=>{const m=new Map();D.recs.filter(r=>r.ruta===route).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:AD[r.cr]!==undefined?AD[r.cr]:(a.dir||'')})}});return[...m.values()]};
 async function geoMissing(){const l=rs().filter(s=>!geo[s.cr]);let ok=0;
- for(let i=0;i<l.length;i++){$('st').textContent='Ubicando tiendas '+(i+1)+'/'+l.length+'… (necesita internet)';if(await geocode(l[i]))ok++;await sleep(1100)}
- const f=l.filter(s=>!geo[s.cr]||(geo[s.cr].lvl||0)>=4);$('st').textContent=l.length?('Ubicadas '+ok+' de '+l.length+(f.length?'. Revisar ubicación: '+f.map(s=>s.tienda).join(', ')+' (usa Navegar o “Estoy aquí”)':'')+'. Posiciones aproximadas.'):'';render()}
+ netFail=0;for(let i=0;i<l.length&&netFail<3;i++){$('st').textContent='Ubicando tiendas '+(i+1)+'/'+l.length+'… (necesita internet)';if(await geocode(l[i]))ok++;await sleep(1100)}
+ if(netFail>=3){$('st').textContent='No hay conexión con el buscador de mapas (OpenStreetMap). Usa el Excel con coordenadas: 📥 Cargar Excel.';render();return}const f=l.filter(s=>!geo[s.cr]||(geo[s.cr].lvl||0)>=4);$('st').textContent=l.length?('Ubicadas '+ok+' de '+l.length+(f.length?'. Revisar ubicación: '+f.map(s=>s.tienda).join(', ')+' (usa Navegar o “Estoy aquí”)':'')+'. Posiciones aproximadas.'):'';render()}
 $('geoall').onclick=geoMissing;
 $('vw').onclick=()=>{view=view==='map'?'list':'map';$('map').hidden=view!=='map';$('list').hidden=view==='map';$('vw').textContent=view==='map'?'📋 Lista':'🗺️ Mapa';fitNext=true;render();if(map)setTimeout(()=>map.invalidateSize(),50)};
-$('plan').onclick=async()=>{await geoMissing();
+$('plan').onclick=async()=>{
  const pend=rs().filter(s=>geo[s.cr]&&!D.recs.filter(r=>r.ruta===route&&r.cr===s.cr).every(r=>done[r.id]));
- if(!pend.length)return $('st').textContent='No hay tiendas pendientes con ubicación';
+ if(!pend.length)return $('st').textContent='No hay tiendas pendientes con coordenadas: cárgalas con el Excel (📥 Cargar Excel)';
  const ps=pend.map(s=>({lat:geo[s.cr].lat,lng:geo[s.cr].lng,cr:s.cr})),pts=(me?[{lat:me.lat,lng:me.lng,me:1}]:[]).concat(ps);let ord=null,info='';RL[route]=null;
  if(pts.length<=40){try{const j=await(await fetch('https://router.project-osrm.org/trip/v1/driving/'+pts.map(p=>p.lng+','+p.lat).join(';')+'?source=first&roundtrip=false&geometries=geojson&overview=full')).json();
   if(j.code==='Ok'){ord=j.waypoints.map((w,i)=>[w.waypoint_index,i]).sort((a,b)=>a[0]-b[0]).map(x=>pts[x[1]]).filter(p=>!p.me).map(p=>p.cr);RL[route]=j.trips[0].geometry.coordinates.map(c=>[c[1],c[0]]);info=' · '+Math.round(j.trips[0].distance/1000)+' km · '+Math.round(j.trips[0].duration/60)+' min en auto'}}catch(e){}}
  if(!ord){let cur=me||ps[0],rest=ps.slice(),o=[];while(rest.length){let bi=0,bd=1e18;rest.forEach((p,i)=>{const d=hav(cur.lat,cur.lng,p.lat,p.lng);if(d<bd){bd=d;bi=i}});cur=rest.splice(bi,1)[0];o.push(cur.cr)}ord=o;info=' · orden por cercanía (sin conexión a rutas)'}
- P[route]=ord;SV('plan',P);near=false;fitNext=true;$('st').textContent='Ruta: '+ord.length+' paradas'+info;render()};
+ P[route]=ord;SV('plan',P);near=false;fitNext=true;$('st').textContent='Ruta: '+ord.length+' paradas'+info+(rs().some(s=>!geo[s.cr])?' · '+rs().filter(s=>!geo[s.cr]).length+' sin coordenadas (no incluidas)':'');render()};
 $('gmr').onclick=()=>{const td=$('td');if(!td.hidden){td.hidden=true;return}
  const l=rs().filter(s=>!D.recs.filter(r=>r.ruta===route&&r.cr===s.cr).every(r=>done[r.id])),cp=s=>(s.dir?parse(s.dir).cp:'')||'99999',px=s=>{const i=(P[route]||[]).indexOf(s.cr);return i<0?9999:i};
  l.sort((a,b)=>P[route]?px(a)-px(b):(a.mpo.toUpperCase().localeCompare(b.mpo.toUpperCase())||cp(a).localeCompare(cp(b))||a.tienda.localeCompare(b.tienda)));
@@ -144,6 +149,37 @@ $('gmr').onclick=()=>{const td=$('td');if(!td.hidden){td.hidden=true;return}
  for(let i=0;i<l.length;i+=8){const c=l.slice(i,i+8),q=c.map(qAd),u='https://www.google.com/maps/dir/?api=1&travelmode=driving&destination='+encodeURIComponent(q[q.length-1])+(q.length>1?'&waypoints='+encodeURIComponent(q.slice(0,-1).join('|')):'');
   h+='<p><a class="nav" style="padding:6px 10px;text-decoration:none" target="_blank" rel="noopener" href="'+u+'">Tanda '+(i/8+1)+' ▶</a> '+c.map((s,k)=>(i+k+1)+'. '+esc(s.tienda)).join(' → ')+'</p>'}
  td.innerHTML=h};
+const fx=s=>String(s==null?'':s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const ds=v=>v instanceof Date?new Date(v.getTime()-v.getTimezoneOffset()*6e4).toISOString().slice(0,10):String(v==null?'':v).trim().slice(0,10);
+const BR=s=>{const l=s.toLowerCase();return l.startsWith('hei')?'Heineken':l.startsWith('mod')?'Modelo':l.startsWith('kof')?'Kof':s};
+function coord(c){c=String(c||'');let m=c.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||c.match(/(-?\d{1,3}\.\d+)\s*[,; ]\s*(-?\d{1,3}\.\d+)/);if(!m)return null;let a=+m[1],b=+m[2];if(a<-50&&b>0)[a,b]=[b,a];return a>14&&a<33&&b<-86&&b>-118?{lat:a,lng:b}:'bad'}
+function fillBrands(){$('bf').innerHTML='<option value="">Todas</option>'+[...new Set(D.recs.map(r=>r.marca))].map(x=>'<option>'+esc(x)+'</option>').join('')}
+async function loadXlsx(file){try{
+ const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true}),ws=wb.Sheets.Recorrido||wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+ const get=(r,f)=>{for(const k in r)if(f(fx(k)))return r[k];return''},S=(r,f)=>String(get(r,f)).trim();
+ const recs=[],addr={},ng={},ord={},rutas=[];let bad=0;
+ rows.forEach(r=>{const cr=S(r,k=>k==='cr').toUpperCase(),ruta=S(r,k=>k==='ruta'),marca=BR(S(r,k=>k==='marca'));if(!cr||!ruta||!marca)return;
+  if(!rutas.includes(ruta))rutas.push(ruta);
+  const med=S(r,k=>k.startsWith('medida')&&!k.includes('original')).replace(/×/g,'x'),dir=S(r,k=>k==='direccion'),mpo=S(r,k=>k==='municipio');
+  recs.push({ruta,marca,cr,tienda:S(r,k=>k==='tienda'),mpo,tipo:S(r,k=>k==='tipo')||'Lona',medida:med,orig:S(r,k=>k.startsWith('medidaoriginal'))||med,promo:S(r,k=>k.startsWith('promo')),desde:ds(get(r,k=>k.startsWith('vigenciadesde'))),hasta:ds(get(r,k=>k.startsWith('vigenciahasta')))});
+  if(!addr[cr]||(dir&&!addr[cr].dir))addr[cr]={dir,mpo};
+  const c=coord(get(r,k=>k.startsWith('coord')));if(c==='bad')bad++;else if(c)ng[cr]={lat:c.lat,lng:c.lng,src:'manual'};
+  const o=parseFloat(get(r,k=>k==='orden'));if(!isNaN(o)){const key=ruta+'|'+cr;ord[key]=Math.min(ord[key]??1e9,o)}});
+ if(!recs.length)return $('st').textContent='No encontré filas válidas. Revisa que existan las columnas Ruta, CR, Tienda, Marca, Tipo y Medida.';
+ const k0=r=>r.cr+'|'+r.marca+'|'+r.tipo,old={};D.recs.forEach(r=>{if(done[r.id])old[k0(r)]=1});
+ recs.forEach((r,i)=>r.id=i);const nd={};recs.forEach(r=>{if(old[k0(r)])nd[r.id]=true});
+ const og=geo;geo={};Object.keys(og).forEach(k=>{if(og[k].src==='manual'&&addr[k])geo[k]=og[k]});Object.assign(geo,ng);
+ P={};rutas.forEach(ru=>{const l=Object.keys(ord).filter(k=>k.startsWith(ru+'|')).sort((a,b)=>ord[a]-ord[b]).map(k=>k.slice(ru.length+1));if(l.length)P[ru]=l});
+ D={rutas,recs,addr};done=nd;AD={};RL={};route=rutas[0];fitNext=true;
+ SV('data',D);SV('done',done);SV('geo2',geo);SV('plan',P);SV('ad',AD);fillBrands();
+ const st=new Set(recs.map(r=>r.cr)),sc=[...st].filter(c=>!geo[c]).length;
+ $('st').textContent='Cargado: '+st.size+' tiendas, '+recs.length+' espacios, '+rutas.length+' rutas. '+(sc?sc+' sin coordenadas (se navegan con Google Maps). ':'Todas con coordenadas. ')+(bad?bad+' coordenadas inválidas ignoradas.':'');render()
+ }catch(e){$('st').textContent='No se pudo leer el Excel: '+e.message}}
+$('xl').onclick=()=>$('xf').click();$('xf').onchange=e=>{if(e.target.files[0])loadXlsx(e.target.files[0]);e.target.value=''};
+$('xe').onclick=()=>{const rows=[];D.rutas.forEach(ru=>D.recs.filter(r=>r.ruta===ru).forEach(r=>{const a=D.addr[r.cr]||{},g=geo[r.cr],o=(P[ru]||[]).indexOf(r.cr);
+ rows.push({'Ruta':ru,'CR':r.cr,'Tienda':r.tienda,'Municipio':r.mpo||a.mpo||'','Dirección':AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),'Coordenadas (pegar de Google Maps)':g&&g.src==='manual'?g.lat.toFixed(6)+', '+g.lng.toFixed(6):'','Orden':o<0?'':o+1,'Marca':r.marca,'Tipo':r.tipo,'Medida (m)':r.medida,'Medida original':r.orig,'Promoción':r.promo,'Vigencia desde':r.desde||(VG[r.marca]||[])[0]||'','Vigencia hasta':r.hasta||(VG[r.marca]||[])[1]||''})}));
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Recorrido');XLSX.writeFile(wb,'Recorrido_actual.xlsx')};
+$('orig').onclick=()=>{if(confirm('¿Volver a los datos originales? Se borra el avance, las notas y lo cargado desde Excel.')){['data','done','geo','geo2','plan','ad','notes'].forEach(k=>localStorage.removeItem(k));location.reload()}};
 function updateMe(){if(!map)return;if(!me){if(meMk){meMk.remove();meMk=null}return}
  if(meMk)meMk.setLatLng([me.lat,me.lng]);else meMk=L.circleMarker([me.lat,me.lng],{radius:8,color:'#fff',weight:3,fillColor:'#1a73e8',fillOpacity:1}).addTo(map)}
 window.doneAll=cr=>{D.recs.filter(r=>r.ruta===route&&r.cr===cr).forEach(r=>done[r.id]=true);SV('done',done);map.closePopup();render()};
@@ -170,6 +206,6 @@ document.addEventListener('click',async e=>{const t=e.target,r=t.dataset.r;
 document.addEventListener('change',e=>{const t=e.target;
  if(t.dataset.id){done[t.dataset.id]=t.checked||undefined;SV('done',done);render()}
  if(t.dataset.n){notes[t.dataset.n]=t.value;SV('notes',notes)}});
-render();
+fillBrands();render();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>

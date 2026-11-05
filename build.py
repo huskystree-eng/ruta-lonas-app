@@ -1,8 +1,9 @@
 import json
 d=json.load(open('/tmp/data.json'))
 recs=d['recs']
+VG={'Heineken':('2026-10-30','2026-11-14'),'Modelo':('2026-11-05','2026-12-02'),'Kof':('2026-11-05','2026-12-02')}
 for i,r in enumerate(recs):
-    r['id']=i
+    r['id']=i;r['desde'],r['hasta']=VG[r['marca']]
     a=d['addr'].get(r['cr'],{})
     if not r['mpo']: r['mpo']=a.get('mpo','')
     r['tienda']=r['tienda'].strip()
@@ -15,7 +16,7 @@ addr={k:{'dir':v['dir'],'mpo':v['mpo']} for k,v in d['addr'].items() if k in use
 data=json.dumps(dict(rutas=rutas,recs=recs,addr=addr,fix=FIX),ensure_ascii=False,separators=(',',':'))
 open('index.html','w').write(open('template.html').read().replace('/*DATA*/',data))
 json.dump({"name":"Recorrido Lonas P12","short_name":"Lonas P12","start_url":".","display":"standalone","background_color":"#c8102e","theme_color":"#c8102e","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]},open('manifest.json','w'))
-open('sw.js','w').write("""const C='lonas-p12-v1',F=['./','index.html','manifest.json','icon-192.png'];
+open('sw.js','w').write("""const C='lonas-p12-v2',F=['./','index.html','manifest.json','icon-192.png','xlsx.full.min.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x))))));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||!e.request.url.startsWith(self.location.origin))return;
