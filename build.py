@@ -18,7 +18,7 @@ addr={k:{'dir':v['dir'],'mpo':v['mpo']} for k,v in d['addr'].items() if k in use
 data=json.dumps(dict(rutas=rutas,recs=recs,addr=addr,fix=FIX),ensure_ascii=False,separators=(',',':'))
 open('index.html','w').write(open('template.html').read().replace('/*DATA*/',data))
 json.dump({"name":"Recorrido Lonas P12","short_name":"Lonas P12","start_url":".","display":"standalone","background_color":"#c8102e","theme_color":"#c8102e","icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png"}]},open('manifest.json','w'))
-open('sw.js','w').write("""const C='lonas-p12-v3',F=['./','index.html','manifest.json','icon-192.png','xlsx.full.min.js','exceljs.min.js'];
+open('sw.js','w').write("""const C='lonas-p12-v4',F=['./','index.html','manifest.json','icon-192.png','xlsx.full.min.js','exceljs.min.js'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(C).then(c=>c.addAll(F))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x))))));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||!e.request.url.startsWith(self.location.origin))return;
