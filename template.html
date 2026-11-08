@@ -28,6 +28,22 @@ h3{margin:0;font-size:16px}h3 small{color:var(--mut);font-weight:400}
 .sp{display:flex;gap:8px;align-items:flex-start;padding:7px 8px}
 .ph{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:0 8px 8px 38px}.ph button{font-size:12px;padding:5px 8px}.th{height:54px;width:54px;object-fit:cover;border-radius:6px;border:2px solid var(--ac)}.ph small{color:var(--mut);font-size:11px}
 [hidden]{display:none!important}
+body.simple>header,body.simple>.tabs,body.simple>.tools,body.simple>#td,body.simple>#map,body.simple>#list{display:none!important}
+body:not(.simple)>#sm{display:none}
+#sm{padding:10px 12px 60px;max-width:560px;margin:auto;font-size:16px}
+.big{display:block;width:100%;padding:18px 12px;font-size:19px;font-weight:700;border-radius:14px;border:0;background:var(--ac);color:#fff;margin:10px 0;text-align:center;text-decoration:none;white-space:normal}
+.big small{display:block;font-weight:400;font-size:13px;opacity:.9;margin-top:2px}.big.g{background:#1f8f4a}.big.b{background:#1a73e8}.big.o{background:var(--card);color:var(--tx);border:2px solid var(--bd)}
+.card2{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}.sp2{border-left:6px solid var(--bd)}.sp2.Heineken{border-color:var(--hnk)}.sp2.Modelo{border-color:var(--mod)}.sp2.Kof{border-color:var(--kof)}
+.what{font-size:21px;font-weight:800;line-height:1.25}.small{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.warn{color:var(--ac);font-weight:700;margin:6px 0}.okb{background:#1f8f4a;color:#fff;font-weight:700;padding:10px;border-radius:10px;text-align:center;margin:8px 0}
+.topb{display:flex;justify-content:space-between;align-items:center;gap:8px}.bar2{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:6px 0}.bar2 i{display:block;height:100%;background:#1f8f4a}
+.nv{display:flex;gap:6px;align-items:center;margin:14px 0}.nv select{flex:1;min-width:0;padding:10px}.sm{padding:9px 12px}.lk{color:var(--mut);font-size:13px}#sm .ph{padding:6px 0}#sm .th{height:64px;width:64px}
+#ed{position:fixed;inset:0;z-index:15;background:var(--bg);overflow:auto;padding:8px 10px 60px}
+.edh{position:sticky;top:0;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 0;z-index:2}
+.er{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px;margin:10px 0}.erh{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.erh b{font-size:16px}.erh small{color:var(--mut)}.eb{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.sr{display:flex;gap:4px;align-items:center;padding:5px 0;border-top:1px solid var(--bd)}.sn{flex:1;min-width:0;font-size:13px}.sn small{color:var(--mut)}
+.sr button,.sr select,.erh button,.edh button{padding:5px 8px;font-size:13px}.sr select{max-width:96px}
+.ef{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px;margin:8px 0}.ef input,.ef select{width:100%;margin:3px 0;padding:8px;box-sizing:border-box}
 #ov{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px}#ov img{max-width:100%;max-height:75vh;border-radius:6px}
 .sp input{width:22px;height:22px;margin:0;flex:none}.sp b{font-size:15px}
 .tag{background:#555;font-size:11px;padding:1px 6px;border-radius:9px;color:#fff;margin-left:4px}.tag.Heineken{background:var(--hnk)}.tag.Modelo{background:var(--mod)}.tag.Kof{background:var(--kof)}
@@ -52,7 +68,7 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 <select id="bf"><option value="">Todas</option><option>Heineken</option><option>Modelo</option><option>Kof</option></select>
 </div>
 <div class="tools">
-<button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="rp">📸 Informe con fotos</button><button id="gh">⚙ GitHub</button><button id="mt">🧰 Material</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden><input type="file" id="cam" accept="image/*" capture="environment" hidden>
+<button id="ms">👤 Modo simple</button><button id="eb">✏️ Editar rutas</button><button id="xl">📥 Cargar Excel</button><button id="xe">📤 Bajar Excel</button><button id="gh">⚙️ GitHub</button><button id="rp">📸 Informe con fotos</button><button id="mt">🧰 Material</button><button id="orig">♻ Originales</button><input type="file" id="xf" accept=".xlsx,.xls" hidden><input type="file" id="cam" accept="image/*" capture="environment" hidden>
 </div>
 <div class="tools">
 <button id="vw">🗺️ Mapa</button><button id="gmr">🧭 Ruta en Google Maps</button><button id="plan">🧭 Trazar ruta</button><button id="gps">📍 Activar GPS</button><button id="near">Más cercanas</button><button id="hd">Ocultar hechas</button><button id="geoall">Ubicar tiendas</button><button id="csv">Exportar avance</button>
@@ -60,18 +76,23 @@ textarea{width:100%;margin-top:6px;font:inherit;font-size:13px;border:1px solid 
 <div id="ov" hidden><img id="ovi"><div><button id="ovr">📷 Repetir</button> <button id="ovd">🗑 Borrar</button> <button id="ovc">Cerrar</button></div></div>
 <div id="st"></div>
 <div id="td" class="td" hidden></div>
+<div id="sm"></div>
+<div id="ed" hidden></div>
 <div id="map" hidden></div>
 <main id="list"></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="xlsx.full.min.js"></script>
 <script src="exceljs.min.js"></script>
+<script src="jspdf.umd.min.js"></script>
+<script src="jspdf.plugin.autotable.min.js"></script>
 <script>
 const D0=/*DATA*/;
 const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
 const SV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let D=LS('data')||D0,done=LS('done')||{},geo=LS('geo2')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='',view='list',map,layer,meMk,rline,fitNext=true,P=LS('plan')||{},RL={},AD=LS('ad')||{};
+let BASE=LS('data')||D0,ED=LS('ed')||{},D=buildD(),done=LS('done')||{},geo=LS('geo2')||{},notes=LS('notes')||{},me=null,watch=null,route=D.rutas[0],near=false,hd=false,txt='',brand='',view='list',mode=LS('mode')||'s',sRoute=LS('sroute'),sCur=null,skip=LS('skip')||{},map,layer,meMk,rline,fitNext=true,P=LS('plan')||{},RL={},AD=LS('ad')||{};
 {const o=LS('geo')||{};Object.keys(o).forEach(k=>{if(o[k].src==='manual'&&!geo[k])geo[k]=o[k]})}
 (D.fix||[]).forEach(c=>{if(geo[c]&&geo[c].src==='auto'){delete geo[c];SV('geo2',geo)}});
+Object.keys(D.order||{}).forEach(k=>{if(!P[k])P[k]=D.order[k]});
 const ix=s=>{const i=(P[route]||[]).indexOf(s.cr);return i<0?9999:i};
 const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const VG={Heineken:['2026-10-30','2026-11-14'],Modelo:['2026-11-05','2026-12-02'],Kof:['2026-11-05','2026-12-02']};
@@ -90,7 +111,7 @@ function stores(){const m=new Map(),t=txt.toLowerCase();
  l.forEach(s=>{const g=geo[s.cr];s.cp=s.dir?parse(s.dir).cp:'';s.d=me&&g?hav(me.lat,me.lng,g.lat,g.lng):null;s.ok=s.sp.every(x=>done[x.id])});
  l.sort((a,b)=>(a.ok-b.ok)||(near&&me?((a.d??1e12)-(b.d??1e12)):P[route]?ix(a)-ix(b):(a.mpo.localeCompare(b.mpo)||(a.cp||'').localeCompare(b.cp||'')||a.tienda.localeCompare(b.tienda))));
  return hd?l.filter(s=>!s.ok):l}
-function render(){
+function render(){document.body.classList.toggle('simple',mode==='s');if(mode==='s'){drawSimple();return}
  $('tabs').innerHTML=D.rutas.map(r=>{const n=D.recs.filter(x=>x.ruta===r),d=n.filter(x=>done[x.id]).length;return`<button data-r="${esc(r)}" class="${r===route?'on':''}">${esc(r)} ${d}/${n.length}</button>`}).join('');
  const all=D.recs.length,dn=D.recs.filter(x=>done[x.id]).length;$('pg').textContent=dn+'/'+all+' espacios';$('pb').style.width=(100*dn/all)+'%';
  $('near').classList.toggle('on',near);$('hd').classList.toggle('on',hd);$('gps').classList.toggle('on',!!watch);
@@ -182,8 +203,8 @@ async function loadXlsx(file){try{
  recs.forEach((r,i)=>r.id=i);const nd={};recs.forEach(r=>{if(old[k0(r)])nd[r.id]=true});
  const og=geo;geo={};Object.keys(og).forEach(k=>{if(og[k].src==='manual'&&addr[k])geo[k]=og[k]});Object.assign(geo,ng);
  P={};rutas.forEach(ru=>{const l=Object.keys(ord).filter(k=>k.startsWith(ru+'|')).sort((a,b)=>ord[a]-ord[b]).map(k=>k.slice(ru.length+1));if(l.length)P[ru]=l});
- D={rutas,recs,addr};done=nd;AD={};RL={};route=rutas[0];fitNext=true;
- SV('data',D);SV('done',done);SV('geo2',geo);SV('plan',P);SV('ad',AD);fillBrands();
+ BASE={rutas,recs,addr,main:rutas.filter(r=>!/^otras/i.test(r))};ED={};SV('ed',ED);D=buildD();skip={};SV('skip',skip);done=nd;AD={};RL={};route=rutas[0];fitNext=true;
+ SV('data',BASE);SV('done',done);SV('geo2',geo);SV('plan',P);SV('ad',AD);fillBrands();
  const st=new Set(recs.map(r=>r.cr)),sc=[...st].filter(c=>!geo[c]).length;
  $('st').textContent='Cargado: '+st.size+' tiendas, '+recs.length+' espacios, '+rutas.length+' rutas. '+(sc?sc+' sin coordenadas (se navegan con Google Maps). ':'Todas con coordenadas. ')+(bad?bad+' coordenadas inválidas ignoradas.':'');render()
  }catch(e){$('st').textContent='No se pudo leer el Excel: '+e.message}}
@@ -191,7 +212,7 @@ $('xl').onclick=()=>$('xf').click();$('xf').onchange=e=>{if(e.target.files[0])lo
 $('xe').onclick=()=>{const rows=[];D.rutas.forEach(ru=>D.recs.filter(r=>r.ruta===ru).forEach(r=>{const a=D.addr[r.cr]||{},g=geo[r.cr],o=(P[ru]||[]).indexOf(r.cr);
  rows.push({'Ruta':ru,'CR':r.cr,'Tienda':r.tienda,'Municipio':r.mpo||a.mpo||'','Dirección':AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),'Coordenadas (pegar de Google Maps)':g&&g.src==='manual'?g.lat.toFixed(6)+', '+g.lng.toFixed(6):'','Orden':o<0?'':o+1,'Marca':r.marca,'Tipo':r.tipo,'Medida (m)':r.medida,'Medida original':r.orig,'Promoción':r.promo,'Vigencia desde':r.desde||(VG[r.marca]||[])[0]||'','Vigencia hasta':r.hasta||(VG[r.marca]||[])[1]||'','Acción':r.acc||'Instalar','Qué hacer en el lugar':r.ins||'','Material (pieza)':r.mat||'','Accesorios y herramientas':r.acs||'','Observaciones de la tienda':a.obs||''})}));
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Recorrido');XLSX.writeFile(wb,'Recorrido_actual.xlsx')};
-$('orig').onclick=()=>{if(confirm('¿Volver a los datos originales? Se borra el avance, las notas y lo cargado desde Excel.')){['data','done','geo','geo2','plan','ad','notes'].forEach(k=>localStorage.removeItem(k));location.reload()}};
+$('orig').onclick=()=>{if(confirm('¿Volver a los datos originales? Se borra el avance, las notas y lo cargado desde Excel.')){['data','ed','skip','mode','sroute','done','geo','geo2','plan','ad','notes'].forEach(k=>localStorage.removeItem(k));location.reload()}};
 const PH={},phk=x=>x.cr+'|'+x.marca+'|'+x.tipo+'|'+x.medida;let idbOk=true;
 const DB=new Promise((ok,no)=>{try{const q=indexedDB.open('lonas',1);q.onupgradeneeded=()=>q.result.createObjectStore('f');q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)}catch(e){no(e)}});
 const dbSet=(k,v)=>DB.then(db=>new Promise((ok,no)=>{const t=db.transaction('f','readwrite');v===null?t.objectStore('f').delete(k):t.objectStore('f').put(v,k);t.oncomplete=ok;t.onerror=()=>no(t.error)}));
@@ -219,6 +240,21 @@ document.addEventListener('click',e=>{const t=e.target;
 $('ovc').onclick=()=>{$('ov').hidden=true};
 $('ovr').onclick=()=>{const k=$('ov').dataset.k;$('ov').hidden=true;$('cam').dataset.k=k;$('cam').click()};
 $('ovd').onclick=async()=>{const k=$('ov').dataset.k;if(!confirm('¿Borrar esta foto?'))return;URL.revokeObjectURL(PH[k].url);delete PH[k];try{await dbSet(k,null)}catch(e){}$('ov').hidden=true;render()};
+async function ghApi(path,opt){opt=opt||{};const c=LS('gh')||{};const r=await fetch('https://api.github.com'+path,{...opt,headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error((j.message||('error '+r.status))+(r.status===401?' (token inválido o vencido)':r.status===403||r.status===404?' (revisa el nombre del repositorio y que el token tenga permiso Contents: Read and write)':''));return j}
+async function ghUpload(name,buf){const c=LS('gh'),u=new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));
+ const path=(c.dir?c.dir+'/':'')+name,r=await fetch('https://api.github.com/repos/'+c.repo+'/contents/'+path.split('/').map(encodeURIComponent).join('/'),{method:'PUT',headers:{'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:JSON.stringify({message:'Informe de seguimiento '+name,content:btoa(s),branch:c.branch||undefined})}),j=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error((j.message||('error '+r.status))+(r.status===401?' (token inválido o vencido)':r.status===403||r.status===404?' (revisa repositorio y permiso Contents: Read and write)':r.status===422?' (¿ya existe ese archivo?)':''));return j.content.html_url}
+$('gh').onclick=async()=>{const c=LS('gh')||{};
+ const repo=prompt('Repositorio donde se guardarán las evidencias, con el formato usuario/repositorio.\nRecomendado: un repositorio PRIVADO.',c.repo||'');if(!repo)return;
+ const dir=prompt('Carpeta dentro del repositorio (se crea sola):',c.dir||'evidencias');if(dir===null)return;
+ const tk=prompt('Token de GitHub (fine-grained, solo ese repositorio, permiso Contents: Read and write).'+(c.token?'\nDéjalo vacío para conservar el token actual.':''),'');
+ const n={repo:repo.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/+$/,''),dir:(dir||'').trim().replace(/^\/+|\/+$/g,''),token:(tk||'').trim()||c.token||'',branch:''};
+ if(!n.token)return $('st').textContent='Falta el token de GitHub.';
+ SV('gh',n);$('st').textContent='Probando conexión con GitHub…';
+ try{const i=await ghApi('/repos/'+n.repo);n.branch=i.default_branch;SV('gh',n);
+  $('st').textContent=(i.permissions&&i.permissions.push===false?'⚠ Conecta, pero el token NO puede escribir en ese repositorio. ':'✅ Conectado a '+n.repo+' (carpeta '+(n.dir||'raíz')+'). ')+(i.private?'El repositorio es privado.':'⚠ El repositorio es PÚBLICO: cualquiera podrá ver las fotos del informe.')}
+ catch(e){$('st').textContent='No se pudo conectar: '+e.message}};
 /*REPORT*/
 const b64=b=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=no;r.readAsDataURL(b)});
 async function buildReport(rows,rutas){
@@ -230,36 +266,128 @@ async function buildReport(rows,rutas){
  rs_.addRow(['TOTAL',...tot]).font={bold:true};rs_.addRow([]);rs_.addRow(['Nota: este resumen cuenta solo los espacios incluidos en el informe (con foto o marcados como hechos).']).font={italic:true,color:{argb:'FF7F7F7F'}};
  ws.columns=[['Ruta',20],['CR',9],['Tienda',24],['Municipio',16],['Dirección',36],['Marca',11],['Tipo',9],['Medida (m)',12],['Promoción',40],['Estado',13],['Fecha y hora',17],['GPS (lat, lng)',22],['Notas',28],['Foto ANTES',34],['Foto DESPUÉS',34]].map(([header,width])=>({header,width}));
  ws.getRow(1).eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:RED}};c.alignment={vertical:'middle',horizontal:'center',wrapText:true}});ws.getRow(1).height=24;
- for(const r of rows){const p=r.d||r.a,row=ws.addRow([r.ruta,r.cr,r.tienda,r.mpo,r.dir,r.marca,r.tipo,r.medida,r.promo,r.done?'COMPLETADO':'EN PROCESO',nf(p&&p.ts),p&&p.lat!=null?p.lat.toFixed(6)+', '+p.lng.toFixed(6):'',r.nota,'','']);
-  row.alignment={vertical:'top',wrapText:true};row.getCell(10).font={bold:true,color:{argb:r.done?'FF2E7D32':'FFB26A00'}};let hpt=30;
+ for(const r of rows){const p=r.d||r.a,row=ws.addRow([r.ruta,r.cr,r.tienda,r.mpo,r.dir,r.marca,r.tipo,r.medida,r.promo,r.done?'COMPLETADO':r.skip?'NO REALIZADO':'EN PROCESO',nf(p&&p.ts),p&&p.lat!=null?p.lat.toFixed(6)+', '+p.lng.toFixed(6):'',(r.nota||'')+(r.skip?((r.nota?' | ':'')+'Motivo: '+r.skip):''),'','']);
+  row.alignment={vertical:'top',wrapText:true};row.getCell(10).font={bold:true,color:{argb:r.done?'FF2E7D32':r.skip?'FFC8102E':'FFB26A00'}};let hpt=30;
   for(const[i,p2]of[[13,r.a],[14,r.d]]){if(!p2)continue;const id=wb.addImage({base64:p2.b64||await b64(p2.blob),extension:'jpeg'}),W=240,H=Math.round(W*p2.h/p2.w);ws.addImage(id,{tl:{col:i+.05,row:row.number-1+.03},ext:{width:W,height:H}});hpt=Math.max(hpt,H*.75+8)}
   row.height=Math.min(hpt,400)}
  return wb.xlsx.writeBuffer()}
 $('rp').onclick=async()=>{const rows=[];
- D.recs.forEach(x=>{const k=phk(x),a=PH[k+'|a'],d=PH[k+'|d'];if(!done[x.id]&&!a&&!d)return;const ad=D.addr[x.cr]||{};rows.push({ruta:x.ruta,cr:x.cr,tienda:x.tienda,mpo:x.mpo||ad.mpo||'',dir:AD[x.cr]!==undefined?AD[x.cr]:(ad.dir||''),marca:x.marca,tipo:x.tipo,medida:x.medida,promo:x.promo,done:!!done[x.id],a,d,nota:notes[x.cr]||''})});
+ D.recs.forEach(x=>{const k=phk(x),a=PH[k+'|a'],d=PH[k+'|d'];if(!done[x.id]&&!a&&!d&&!skip[phk(x)])return;const ad=D.addr[x.cr]||{};rows.push({ruta:x.ruta,cr:x.cr,tienda:x.tienda,mpo:x.mpo||ad.mpo||'',dir:AD[x.cr]!==undefined?AD[x.cr]:(ad.dir||''),marca:x.marca,tipo:x.tipo,medida:x.medida,promo:x.promo,done:!!done[x.id],skip:skip[phk(x)]||'',a,d,nota:notes[x.cr]||''})});
  if(!rows.length)return $('st').textContent='Aún no hay espacios hechos ni fotos para el informe.';
  try{$('st').textContent='Generando informe con '+rows.reduce((n,r)=>n+(r.a?1:0)+(r.d?1:0),0)+' fotos…';
- const buf=await buildReport(rows,D.rutas),name='Seguimiento_Lonas_P12_'+new Date().toISOString().slice(0,10)+'.xlsx',f=new File([buf],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
- if(ghCfg()){try{$('st').textContent='Subiendo informe a GitHub…';const u=await ghPut(f,name);$('st').textContent='✅ Informe guardado en tu repositorio de GitHub: '+u.path+' ('+rows.length+' espacios, '+(f.size/1048576).toFixed(1)+' MB). Haz «git pull» en tu carpeta para verlo.';return}catch(e){$('st').textContent='No se pudo subir a GitHub ('+(e&&e.message||e)+'). Se descarga en el celular.'}}
+ const buf=await buildReport(rows,D.rutas),name=(()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return'Seguimiento_Lonas_P12_'+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+'.xlsx'})(),f=new File([buf],name,{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+ const g=LS('gh');if(g&&g.token&&g.repo){try{$('st').textContent='Subiendo informe a GitHub ('+(f.size/1048576).toFixed(1)+' MB)…';const url=await ghUpload(name,buf);$('st').innerHTML='✅ Informe guardado en GitHub ('+rows.length+' espacios): <a href="'+url+'" target="_blank" rel="noopener">'+esc(name)+'</a>';return}catch(e){if(!confirm('No se pudo subir a GitHub: '+e.message+'\n\n¿Descargarlo en este celular en su lugar?')){$('st').textContent='No se subió: '+e.message;return}}}
  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Seguimiento Lonas P12'});$('st').textContent='Informe listo ('+rows.length+' espacios).';return}catch(e){}}
  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=name;a.click();$('st').textContent='Informe descargado: '+name+' ('+rows.length+' espacios, '+(f.size/1048576).toFixed(1)+' MB).'
  }catch(e){$('st').textContent='No se pudo generar el informe: '+(e&&e.message||e)}};
+/*SIMPLE+EDIT*/
+const tc=s=>s&&s===s.toUpperCase()?s.toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase()):s;
+const ordL=ru=>{const m=new Map();D.recs.filter(r=>r.ruta===ru).forEach(r=>{if(!m.has(r.cr)){const a=D.addr[r.cr]||{};m.set(r.cr,{cr:r.cr,tienda:r.tienda,mpo:r.mpo||a.mpo||'',dir:AD[r.cr]!==undefined?AD[r.cr]:(a.dir||''),sp:[]})}m.get(r.cr).sp.push(r)});
+ const l=[...m.values()],pl=P[ru]||[],ip=c=>{const i=pl.indexOf(c);return i<0?9999:i};l.forEach(s=>s.cp=s.dir?parse(s.dir).cp:'');
+ l.sort((a,b)=>pl.length?(ip(a.cr)-ip(b.cr)||a.tienda.localeCompare(b.tienda)):(a.mpo.localeCompare(b.mpo)||a.cp.localeCompare(b.cp)||a.tienda.localeCompare(b.tienda)));return l};
+const hdl=x=>!!done[x.id]||!!skip[phk(x)],mainR=()=>D.main||D.rutas;
+function setMode(m){mode=m;SV('mode',m);render()}
+function drawSimple(){const el=$('sm');
+ if(!sRoute||!mainR().includes(sRoute)){const any=D.recs.some(x=>hdl(x)||PH[phk(x)+'|a']||PH[phk(x)+'|d']);
+  el.innerHTML='<h2 style="margin:6px 0">Recorrido Lonas P12</h2><p>¿Qué ruta vas a hacer hoy?</p>'+mainR().map(ru=>{const l=ordL(ru),h=l.filter(s=>s.sp.every(hdl)).length;return'<button class="big" data-s="r:'+esc(ru)+'">'+esc(ru.replace(/^Ruta /,'').toUpperCase())+'<small>'+h+' de '+l.length+' tiendas listas</small></button>'}).join('')+(any?'<button class="big g" data-s="send">📤 Enviar informe</button>':'')+'<p style="text-align:center"><a href="#" data-s="full" class="lk">Administrador (modo completo)</a></p>';return}
+ const list=ordL(sRoute),tot=list.length,hn=list.filter(s=>s.sp.every(hdl)).length;let cur=list.find(s=>s.cr===sCur)||list.find(s=>!s.sp.every(hdl));
+ let h='<div class="topb"><button class="sm" data-s="home">← Rutas</button><b>'+esc(sRoute.replace(/^Ruta /,'').toUpperCase())+'</b><span>'+hn+'/'+tot+'</span></div><div class="bar2"><i style="width:'+(tot?100*hn/tot:0)+'%"></i></div>';
+ if(!cur){el.innerHTML=h+'<div class="card2" style="text-align:center"><div style="font-size:48px">🎉</div><div class="what">¡Ruta terminada!</div></div><button class="big g" data-s="send">📤 Enviar informe</button><button class="big o" data-s="home">Elegir otra ruta</button>';return}
+ sCur=cur.cr;const idx=list.indexOf(cur),ok=cur.sp.every(hdl),ob=(D.addr[cur.cr]||{}).obs;
+ h+='<div class="card2"><div class="small">Tienda '+(idx+1)+' de '+tot+'</div><div class="what">'+esc(cur.tienda)+'</div><div class="addr">'+esc(cur.mpo)+(cur.dir?' · '+esc(cur.dir):'')+'</div>'+(ob?'<div class="addr">📝 '+esc(ob)+'</div>':'')
+  +'<a class="big b" target="_blank" rel="noopener" href="'+navUrl(cur)+'">🧭 Cómo llegar</a><div style="text-align:center"><a class="lk" target="_blank" rel="noopener" href="'+navUrl(cur,'o')+'">No la encuentro: buscar por nombre</a></div></div>';
+ cur.sp.forEach(x=>{const k=phk(x),[v,w]=vigTxt(x),A=PH[k+'|a'],Dd=PH[k+'|d'],sk=skip[k],th=(s,p)=>p?'<img class="th" data-v="'+esc(k+'|'+s)+'" src="'+p.url+'">':'';
+  h+='<div class="card2 sp2 '+x.marca+'"><div class="small">Qué colocar</div><div class="what"><span class="tag '+x.marca+'">'+esc(x.marca)+'</span> '+esc(x.tipo.toUpperCase())+' '+esc(x.medida.replace(/ x /,' × '))+' m</div>'+(w?'<div class="warn">⚠ '+esc(v)+'</div>':'')
+   +'<details><summary>Ver promoción y pasos</summary>'+esc(x.promo)+(x.ins?'<br><br>'+esc(x.ins):'')+(x.acs?'<br><b>Llevar:</b> '+esc(x.acs):'')+'</details>';
+  if(done[x.id])h+='<div class="okb">✅ Listo</div><div class="ph">'+th('a',A)+th('d',Dd)+'</div>';
+  else if(sk)h+='<div class="warn">No realizado: '+esc(sk)+'</div><button class="sm" data-s="undo:'+esc(k)+'">Deshacer</button>';
+  else h+=(A?'<div class="ph">'+th('a',A)+'<small>Antes ✔</small></div>':'')+'<button class="big" data-p="'+esc(k+(A?'|d':'|a'))+'">📷 '+(A?'2. Foto DESPUÉS':'1. Foto ANTES')+'</button><div style="text-align:center"><a href="#" class="lk" data-s="skip:'+esc(k)+'">No se pudo instalar</a></div>';
+  h+='</div>'});
+ h+='<textarea data-n="'+cur.cr+'" rows="2" placeholder="Notas (opcional)" style="width:100%;margin:6px 0">'+esc(notes[cur.cr]||'')+'</textarea>'+(ok?'<button class="big g" data-s="next">✅ Tienda lista · Siguiente ▶</button>':'')
+  +'<div class="nv"><button class="sm" data-s="mv:-1">◀</button><select id="sj">'+list.map(s=>'<option value="'+s.cr+'"'+(s.cr===cur.cr?' selected':'')+'>'+(s.sp.every(hdl)?'✅ ':'')+esc(s.tienda)+'</option>').join('')+'</select><button class="sm" data-s="mv:1">▶</button></div>';
+ el.innerHTML=h}
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-s]');if(!t)return;e.preventDefault();const s=t.dataset.s,i=s.indexOf(':'),a=i<0?s:s.slice(0,i),b=i<0?'':s.slice(i+1);
+ if(a==='r'){sRoute=b;SV('sroute',b);sCur=null}else if(a==='home'){sRoute=null;SV('sroute',null);sCur=null}else if(a==='next')sCur=null;
+ else if(a==='mv'){const l=ordL(sRoute),j=Math.max(0,Math.min(l.length-1,l.findIndex(x=>x.cr===sCur)+ +b));sCur=l[j].cr}
+ else if(a==='skip'){const r=prompt('¿Por qué no se pudo instalar? (ej. tienda cerrada, sin espacio, no permitieron)');if(r===null)return;skip[b]=r.trim()||'Sin motivo';SV('skip',skip)}
+ else if(a==='undo'){delete skip[b];SV('skip',skip)}else if(a==='send'){$('rp').click();return}else if(a==='full'){setMode('f');return}
+ render();window.scrollTo(0,0)});
+document.addEventListener('change',e=>{if(e.target.id==='sj'){sCur=e.target.value;render();window.scrollTo(0,0)}});
+$('ms').onclick=()=>setMode('s');
+/* ---- edición de rutas ---- */
+function buildD(){const d=JSON.parse(JSON.stringify(BASE)),e=ED,ren=e.ren||{};
+ d.recs=d.recs.filter(r=>!(e.del||[]).includes(r.cr));d.rutas=d.rutas.map(x=>ren[x]||x);d.recs.forEach(r=>{r.ruta=ren[r.ruta]||r.ruta});if(d.main)d.main=d.main.map(x=>ren[x]||x);
+ (e.news||[]).forEach(s=>{d.addr[s.cr]={dir:s.dir||'',mpo:s.mpo||''};s.sp.forEach(x=>d.recs.push({...x,cr:s.cr,tienda:s.tienda,mpo:s.mpo||'',ruta:s.ruta}))});
+ (e.addsp||[]).forEach(s=>{const t=d.recs.find(r=>r.cr===s.cr);if(t)d.recs.push({...s.sp,cr:s.cr,tienda:t.tienda,mpo:t.mpo,ruta:t.ruta})});
+ Object.entries(e.move||{}).forEach(([c,ru])=>d.recs.forEach(r=>{if(r.cr===c)r.ruta=ru}));
+ if(e.rutas)d.rutas=e.rutas.slice();if(!d.rutas.includes('Otras tiendas'))d.rutas.push('Otras tiendas');
+ d.recs.forEach(r=>{if(!d.rutas.includes(r.ruta))r.ruta='Otras tiendas'});if(e.rutas)d.main=d.rutas.filter(x=>x!=='Otras tiendas');return d}
+let edForm=null,edMsg='';
+const saveED=()=>{SV('ed',ED);SV('plan',P);D=buildD();if(!D.rutas.includes(route))route=D.rutas[0];if(sRoute&&!D.rutas.includes(sRoute))sRoute=null;fitNext=true};
+const frozen=ru=>{const l=ordL(ru).map(s=>s.cr);P[ru]=l;return l};
+function moveStore(cr,to){const f=D.recs.find(r=>r.cr===cr);if(!f||f.ruta===to)return;P[f.ruta]=frozen(f.ruta).filter(c=>c!==cr);P[to]=frozen(to).filter(c=>c!==cr).concat([cr]);(ED.move=ED.move||{})[cr]=to;saveED()}
+function shift(ru,cr,d){const l=frozen(ru),i=l.indexOf(cr),j=i+d;if(i<0||j<0||j>=l.length)return;[l[i],l[j]]=[l[j],l[i]];P[ru]=l;SV('plan',P)}
+const edRutas=()=>ED.rutas||(ED.rutas=D.rutas.slice());
+function drawEd(){const el=$('ed'),RS=D.rutas,br=[...new Set(['Heineken','Modelo','Kof'].concat(D.recs.map(r=>r.marca)))];
+ let h='<div class="edh"><b>✏️ Editar rutas</b><span><button data-e="pdfall">🖨 PDF de las rutas</button> <button data-e="rnew">➕ Ruta</button> <button data-e="snew">➕ Tienda nueva</button> <button data-e="close">Cerrar</button></span></div>'+(edMsg?'<div class="addr">'+esc(edMsg)+'</div>':'');
+ if(edForm){const ex=!!edForm.cr;h+='<div class="ef"><b>'+(ex?'Agregar una pieza a '+esc(edForm.cr):'Tienda nueva')+'</b>'+(ex?'':'<input id="f_cr" placeholder="CR (opcional)"><input id="f_t" placeholder="Nombre de la tienda"><input id="f_m" placeholder="Municipio"><input id="f_d" placeholder="Dirección">')
+  +'<select id="f_ma">'+br.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select><select id="f_ti"><option>Lona</option><option>Pendón</option></select><input id="f_me" placeholder="Medida, ej. 1.35 x 4.85"><input id="f_pr" placeholder="Promoción (texto de la pieza)">'
+  +(ex?'':'<select id="f_ru">'+RS.map(x=>'<option>'+esc(x)+'</option>').join('')+'</select>')+'<button data-e="fsave" class="on">Guardar</button> <button data-e="fcancel">Cancelar</button></div>'}
+ RS.forEach((ru,ri)=>{const l=ordL(ru),ot=D.recs.filter(r=>r.ruta!==ru),seen=new Set();
+  h+='<section class="er"><div class="erh"><b>'+esc(ru)+'</b><small>'+l.length+' tiendas</small><span class="eb"><button data-e="ru" data-i="'+ri+'">▲</button><button data-e="rd" data-i="'+ri+'">▼</button><button data-e="rr" data-i="'+ri+'">✏</button><button data-e="pdf" data-i="'+ri+'">🖨 PDF</button>'+(ru==='Otras tiendas'?'':'<button data-e="rx" data-i="'+ri+'">🗑</button>')+'</span></div>';
+  l.forEach((s,k)=>{h+='<div class="sr"><span class="sn">'+(k+1)+'. <b>'+esc(s.tienda)+'</b> <small>'+esc(s.mpo)+' · '+s.cr+' · '+s.sp.length+' pieza(s)</small></span><button data-e="su" data-r="'+esc(ru)+'" data-c="'+s.cr+'">▲</button><button data-e="sd" data-r="'+esc(ru)+'" data-c="'+s.cr+'">▼</button><select data-e="mv" data-c="'+s.cr+'"><option value="">↪ Mover</option>'+RS.filter(x=>x!==ru).map(x=>'<option>'+esc(x)+'</option>').join('')+'</select><button data-e="sp" data-c="'+s.cr+'">＋</button><button data-e="'+(ru==='Otras tiendas'?'sdel':'sx')+'" data-c="'+s.cr+'">'+(ru==='Otras tiendas'?'🗑':'✖')+'</button></div>'});
+  h+='<div class="sr"><select id="ad'+ri+'"><option value="">➕ Agregar tienda a esta ruta…</option>'+ot.filter(r=>!seen.has(r.cr)&&seen.add(r.cr)).sort((a,b)=>a.tienda.localeCompare(b.tienda)).map(r=>'<option value="'+r.cr+'">'+esc(r.tienda)+' ('+esc(r.ruta)+')</option>').join('')+'</select><button data-e="add" data-i="'+ri+'">Agregar</button></div></section>'});
+ el.innerHTML=h}
+function openEd(){edMsg='';edForm=null;$('ed').hidden=false;drawEd();$('ed').scrollTop=0}
+$('eb').onclick=openEd;
+$('ed').addEventListener('click',e=>{const t=e.target.closest('[data-e]');if(!t||t.tagName==='SELECT')return;const a=t.dataset.e,ru=t.dataset.r,c=t.dataset.c,i=+t.dataset.i,RS=D.rutas;edMsg='';
+ if(a==='close'){$('ed').hidden=true;render();return}
+ else if(a==='su')shift(ru,c,-1);else if(a==='sd')shift(ru,c,1);
+ else if(a==='sx'){moveStore(c,'Otras tiendas')}
+ else if(a==='sdel'){if(!confirm('¿Eliminar esta tienda por completo? No se puede deshacer.'))return;ED.del=(ED.del||[]).concat([c]);ED.news=(ED.news||[]).filter(s=>s.cr!==c);ED.addsp=(ED.addsp||[]).filter(s=>s.cr!==c);Object.keys(P).forEach(k=>{P[k]=P[k].filter(x=>x!==c)});saveED()}
+ else if(a==='add'){const v=$('ad'+i).value;if(v)moveStore(v,RS[i])}
+ else if(a==='ru'||a==='rd'){const r=edRutas(),j=i+(a==='ru'?-1:1);if(j>=0&&j<r.length){const n=RS[i];[r[i],r[j]]=[r[j],r[i]];ED.rutas=r;saveED()}}
+ else if(a==='rnew'){const n=(prompt('Nombre de la ruta nueva:')||'').trim();if(!n)return;if(RS.includes(n)){edMsg='Ya existe una ruta con ese nombre';drawEd();return}const r=edRutas(),o=r.indexOf('Otras tiendas');r.splice(o<0?r.length:o,0,n);P[n]=[];saveED()}
+ else if(a==='rr'){const A=RS[i],B=(prompt('Nuevo nombre de la ruta:',A)||'').trim();if(!B||B===A)return;if(RS.includes(B)){edMsg='Ya existe una ruta con ese nombre';drawEd();return}
+  ED.ren=ED.ren||{};const k=Object.keys(ED.ren).find(x=>ED.ren[x]===A)||A;ED.ren[k]=B;ED.rutas=edRutas().map(x=>x===A?B:x);ED.move=ED.move||{};Object.keys(ED.move).forEach(x=>{if(ED.move[x]===A)ED.move[x]=B});(ED.news||[]).forEach(s=>{if(s.ruta===A)s.ruta=B});if(P[A]){P[B]=P[A];delete P[A]}
+  if(sRoute===A){sRoute=B;SV('sroute',B)}saveED()}
+ else if(a==='rx'){const A=RS[i];if(!confirm('¿Eliminar la ruta "'+A+'"? Sus tiendas pasan a "Otras tiendas".'))return;ordL(A).forEach(s=>moveStore(s.cr,'Otras tiendas'));ED.rutas=edRutas().filter(x=>x!==A);delete P[A];saveED()}
+ else if(a==='snew'){edForm={cr:''};drawEd();$('ed').scrollTop=0;return}
+ else if(a==='sp'){edForm={cr:c};drawEd();$('ed').scrollTop=0;return}
+ else if(a==='fcancel'){edForm=null}
+ else if(a==='fsave'){const g=id=>($(id)?$(id).value:'').trim(),ma=g('f_ma'),ti=g('f_ti'),me_=g('f_me').replace(/[×X]/g,'x');
+  if(!me_){edMsg='Falta la medida (ej. 1.35 x 4.85)';drawEd();return}
+  const sp={id:(ED.nid=(ED.nid||1000)+1),marca:ma,tipo:ti,medida:me_,orig:me_,promo:g('f_pr'),desde:'',hasta:'',acc:'Instalar',ins:'',mat:ti+' '+ma+' '+me_+' m',acs:''};
+  if(edForm.cr){(ED.addsp=ED.addsp||[]).push({cr:edForm.cr,sp})}
+  else{const nm=g('f_t');if(!nm){edMsg='Falta el nombre de la tienda';drawEd();return}let cr=g('f_cr').toUpperCase()||('N'+Date.now().toString(36).slice(-4).toUpperCase());if(D.recs.some(r=>r.cr===cr)){edMsg='Ese CR ya existe: usa el botón ＋ de esa tienda para agregarle una pieza';drawEd();return}
+   const ru=g('f_ru')||RS[0];(ED.news=ED.news||[]).push({cr,tienda:nm,mpo:g('f_m'),dir:g('f_d'),ruta:ru,sp:[sp]});P[ru]=frozen(ru).concat([cr])}
+  edForm=null;saveED()}
+ else if(a==='pdf'||a==='pdfall'){edMsg='Generando PDF…';drawEd();makePdf(a==='pdf'?[RS[i]]:mainR()).then(m=>{edMsg=m;drawEd()}).catch(er=>{edMsg='No se pudo generar el PDF: '+er.message;drawEd()});return}
+ drawEd()});
+$('ed').addEventListener('change',e=>{const t=e.target;if(t.dataset.e==='mv'&&t.value){edMsg='';moveStore(t.dataset.c,t.value);drawEd()}});
+/* ---- PDF para imprimir ---- */
+async function makePdf(rutas){const{jsPDF}=window.jspdf,doc=new jsPDF({orientation:'landscape',unit:'pt',format:'letter'}),PR={};let first=true,tiendas=0;
+ const cell=(x)=>x;
+ for(const ru of rutas){const l=ordL(ru);if(!l.length)continue;if(!first)doc.addPage();first=false;tiendas+=l.length;
+  const rows=[],tally={};let n=0;
+  l.forEach(s=>s.sp.forEach((x,k)=>{n++;const key=x.marca+' '+x.tipo+' '+x.medida.replace(/ x /,' × ')+' m';tally[key]=(tally[key]||0)+1;
+   rows.push([n,s.tienda+'  (CR '+s.cr+')\n'+tc(s.mpo)+'\n'+(s.dir?tc(s.dir):'(sin dirección)')+(k>0?'\n(otra pieza de esta tienda)':''),
+    x.marca.toUpperCase()+' · '+x.tipo.toUpperCase()+' '+x.medida.replace(/ x /,' × ')+' m'+(x.orig&&x.orig!==x.medida?'  (medida original '+x.orig.replace(/ x /,' × ')+')':'')+'\n'+(x.promo||'Sin texto de promoción')+'\nVigencia: '+(x.vigencia||[x.desde,x.hasta].filter(Boolean).join(' a ')||'—'),'',''])}));
+  doc.setFont('helvetica','bold');doc.setFontSize(17);doc.setTextColor(200,16,46);doc.text(ru.toUpperCase(),28,48);
+  doc.setFontSize(8.5);doc.setTextColor(40);doc.text('Fecha: ____ / ____ / ________      Responsable: ______________________________      Salida: ______ h      Regreso: ______ h',28,62);
+  doc.setFont('helvetica','normal');const sm=doc.splitTextToSize(l.length+' tiendas · '+n+' espacios. Piezas a cargar: '+Object.entries(tally).map(([k,v])=>k+' x'+v).join('  ·  '),736);doc.text(sm,28,75);
+  doc.autoTable({startY:75+sm.length*10+4,head:[['#','TIENDA Y DIRECCIÓN','QUÉ HACER EN LA TIENDA','HECHO','NOTAS ADICIONALES']],body:rows,margin:{left:28,right:28,top:34,bottom:34},tableWidth:736,rowPageBreak:'avoid',
+   styles:{fontSize:8,cellPadding:4,minCellHeight:54,valign:'top',lineColor:[150,150,150],lineWidth:.5,textColor:20,overflow:'linebreak'},headStyles:{fillColor:[200,16,46],textColor:255,halign:'center',valign:'middle',minCellHeight:18},
+   alternateRowStyles:{fillColor:[247,247,247]},columnStyles:{0:{cellWidth:24,halign:'center',fontStyle:'bold'},1:{cellWidth:196},2:{cellWidth:262},3:{cellWidth:46},4:{cellWidth:208}},
+   didDrawCell:d=>{if(d.section!=='body')return;const c=d.cell;if(d.column.index===3){doc.setDrawColor(0);doc.setLineWidth(1.3);doc.rect(c.x+(c.width-24)/2,c.y+(c.height-24)/2,24,24)}
+    if(d.column.index===4){doc.setDrawColor(190);doc.setLineWidth(.5);for(let q=1;q<4;q++)doc.line(c.x+6,c.y+c.height*q/4,c.x+c.width-6,c.y+c.height*q/4)}},
+   didDrawPage:()=>{PR[doc.internal.getCurrentPageInfo().pageNumber]=ru}})}
+ if(first)throw new Error('No hay tiendas en esas rutas');
+ const N=doc.getNumberOfPages();for(let i=1;i<=N;i++){doc.setPage(i);doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(110);doc.text('Recorrido Lonas P12 · '+(PR[i]||''),28,596);doc.text('Pág. '+i+' de '+N,764,596,{align:'right'})}
+ const d=new Date(),p=n=>String(n).padStart(2,'0'),name='Recorrido_'+(rutas.length===1?rutas[0].replace(/\s+/g,'_'):'Rutas')+'_'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.pdf',f=new File([doc.output('blob')],name,{type:'application/pdf'});
+ if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:name});return'PDF listo: '+name+' ('+N+' páginas)'}catch(e){}}
+ const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=name;a.click();return'PDF descargado: '+name+' ('+N+' páginas, '+tiendas+' tiendas)'}
 
-/*GITHUB*/
-const GHK='lonas_gh',ghCfg=()=>{try{const c=JSON.parse(localStorage.getItem(GHK)||'null');return c&&c.token&&c.owner&&c.repo?c:null}catch(e){return null}};
-async function ghPut(f,name){const c=ghCfg(),path=(c.dir?c.dir.replace(/^\/+|\/+$/g,'')+'/':'')+name,url='https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+path.split('/').map(encodeURIComponent).join('/'),H={Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'};
- const bytes=new Uint8Array(await f.arrayBuffer());let s='';for(let i=0;i<bytes.length;i+=32768)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+32768));
- let sha;const g=await fetch(url+'?ref='+encodeURIComponent(c.branch||'main'),{headers:H});if(g.ok)sha=(await g.json()).sha;else if(g.status===401||g.status===403)throw new Error('token sin permiso (Contents: Read and write)');
- const r=await fetch(url,{method:'PUT',headers:{...H,'Content-Type':'application/json'},body:JSON.stringify({message:'Informe con evidencia fotográfica '+name,content:btoa(s),branch:c.branch||'main',sha})});
- if(!r.ok){let m=r.status;try{m=(await r.json()).message||m}catch(e){}throw new Error(m)}return{path}}
-$('gh').onclick=()=>{const c=ghCfg()||{},h=location.hostname.endsWith('github.io')?location.hostname.split('.')[0]:'',p=location.pathname.split('/')[1]||'';
- const owner=prompt('Usuario u organización de GitHub:',c.owner||h);if(owner===null)return;
- const repo=prompt('Nombre del repositorio:',c.repo||p);if(repo===null)return;
- const branch=prompt('Rama (branch):',c.branch||'main');if(branch===null)return;
- const dir=prompt('Carpeta dentro del repositorio donde se guardan los informes:',c.dir===undefined?'evidencias':c.dir);if(dir===null)return;
- const token=prompt('Token de GitHub (fine-grained, solo este repositorio, permiso Contents: Read and write). Deja vacío para borrar la configuración:',c.token||'');if(token===null)return;
- try{if(!token.trim())localStorage.removeItem(GHK);else localStorage.setItem(GHK,JSON.stringify({owner:owner.trim(),repo:repo.trim(),branch:branch.trim()||'main',dir:dir.trim(),token:token.trim()}))}catch(e){}
- $('st').textContent=ghCfg()?'GitHub configurado: los informes se guardarán en '+owner.trim()+'/'+repo.trim()+'/'+dir.trim():'Configuración de GitHub borrada: los informes se descargan en el celular.'};
 function updateMe(){if(!map)return;if(!me){if(meMk){meMk.remove();meMk=null}return}
  if(meMk)meMk.setLatLng([me.lat,me.lng]);else meMk=L.circleMarker([me.lat,me.lng],{radius:8,color:'#fff',weight:3,fillColor:'#1a73e8',fillOpacity:1}).addTo(map)}
 window.doneAll=cr=>{D.recs.filter(r=>r.ruta===route&&r.cr===cr).forEach(r=>done[r.id]=true);SV('done',done);map.closePopup();render()};

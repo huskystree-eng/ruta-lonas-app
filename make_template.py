@@ -5,9 +5,10 @@ from openpyxl.utils import get_column_letter as L
 from openpyxl.worksheet.datavalidation import DataValidation
 from openpyxl.formatting.rule import FormulaRule
 from defaults import ins, mat
-d=json.load(open('data_origen.json')); FIX={'50WFV'}
+d=json.load(open('data_app.json')); FIX={'50WFV'}
 VG={'Heineken':('2026-10-30','2026-11-14'),'Modelo':('2026-11-05','2026-12-02'),'Kof':('2026-11-05','2026-12-02')}
-RUTAS=['Ruta Cardel','Ruta Costa','Por Medida y Promoción']
+RUTAS=d['rutas']
+ORD=lambda r:(d['order'].get(r['ruta'],[]).index(r['cr']) if r['cr'] in d['order'].get(r['ruta'],[]) else 9999)
 COLS=[('Ruta','UBICACIÓN',22,'Obligatorio'),('CR','UBICACIÓN',9,'Obligatorio'),('Tienda','UBICACIÓN',26,'Obligatorio'),
 ('Municipio','UBICACIÓN',18,'Opcional'),('Dirección','UBICACIÓN',46,'Opcional'),
 ('Coordenadas (pegar de Google Maps)','UBICACIÓN',30,'Ej. 19.1234, -96.1234'),('Orden','UBICACIÓN',8,'1, 2, 3… (opcional)'),
@@ -20,7 +21,7 @@ GC={'UBICACIÓN':'1F4E78','QUÉ INSTALAR':'833C0B','PROMOCIÓN':'375623','TRABAJ
 rows=[]
 for r in d['recs']:
     a=d['addr'].get(r['cr'],{}); rows.append((RUTAS.index(r['ruta']),(r['mpo'] or a.get('mpo','')).upper(),r['tienda'],r,'' if r['cr'] in FIX else a.get('dir','')))
-rows.sort(key=lambda x:(x[0],x[1],x[2]))
+rows.sort(key=lambda x:(x[0],ORD(x[3]),x[1],x[2]))
 wb=Workbook(); wi=wb.active; wi.title='Instrucciones'; ws=wb.create_sheet('Recorrido'); wr=wb.create_sheet('Resumen'); wc=wb.create_sheet('Catalogos')
 thin=Side(style='thin',color='BFBFBF'); bd=Border(left=thin,right=thin,top=thin,bottom=thin)
 yel=PatternFill('solid',fgColor='FFF2CC'); gry=PatternFill('solid',fgColor='EDEDED')
@@ -38,7 +39,7 @@ Y={6,7,18,19}  # columnas a completar
 for _,mpo,_,r,dir_ in rows:
     v=VG.get(r['marca'],('',''))
     q=(dir_+', '+mpo+', Veracruz, México') if dir_ else 'OXXO '+r['tienda']+', '+mpo+', Veracruz, México'
-    ws.append([r['ruta'],r['cr'],r['tienda'],mpo,dir_,'','',r['marca'],r['tipo'],r['medida'],r['orig'],r['promo'] or '',v[0],v[1],'Instalar',ins(r),mat(r),'','','Abrir en Maps'])
+    ws.append([r['ruta'],r['cr'],r['tienda'],mpo,dir_,'',(ORD(r)+1 if ORD(r)<9999 else ''),r['marca'],r['tipo'],r['medida'],r['orig'],r['promo'] or '',v[0],v[1],'Instalar',ins(r),mat(r),'','','Abrir en Maps'])
     i=ws.max_row
     for c in range(1,len(COLS)+1):
         x=ws.cell(i,c); x.border=bd; x.alignment=Alignment(wrap_text=True,vertical='top')

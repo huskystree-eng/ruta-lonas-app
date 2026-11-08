@@ -14,6 +14,10 @@ Regenerar: `python3 build.py` (app) y `python3 make_template.py` (plantilla).
 ## Fotos e informe al cliente
 En cada espacio: 📷 Antes / 📷 Después (abre la cámara, pone fecha, hora, tienda y GPS sobre la foto). Al tomar la foto "Después" el espacio se marca como hecho. **📸 Informe con fotos** genera un Excel con las fotos incrustadas y lo comparte (WhatsApp/correo) o lo descarga.
 
-## Guardar el informe en tu carpeta de GitHub
-Pulsa **⚙ GitHub** (una sola vez) e indica usuario, repositorio, rama y carpeta (por defecto `evidencias`), más un token fine-grained de GitHub limitado a ese repositorio con permiso *Contents: Read and write*. Desde entonces, **📸 Informe con fotos** sube el Excel directo al repositorio (no al celular); en tu computadora haz `git pull` y aparece en esa carpeta. Si falla la subida, se descarga/comparte como antes.
-Ojo: si el repositorio es público, las fotos también lo serán.
+## Guardar el informe directo en GitHub
+⚙️ GitHub → repositorio (usuario/repo, de preferencia PRIVADO), carpeta (evidencias) y token fine-grained con permiso Contents: Read and write solo para ese repositorio. Después, 📸 Informe con fotos sube el Excel a esa carpeta.
+
+## Modo simple (empleados) y modo completo (administrador)
+La app abre en **modo simple**: elegir ruta → una tienda a la vez → qué colocar → 📷 Antes → 📷 Después → siguiente. El administrador entra con "Administrador (modo completo)".
+En modo completo: **✏️ Editar rutas** (ordenar tiendas, mover/quitar/agregar tiendas, crear/renombrar/borrar/ordenar rutas, tienda nueva, pieza nueva) y **🖨 PDF** por ruta o de todas, listo para imprimir (carta horizontal, casilla de hecho y notas).
+Los cambios del editor se guardan en el celular. Para reiniciar: ♻ Originales.
